@@ -1,0 +1,64 @@
+1. Title of Database: Internet advertisements
+   (Cranfield University, ML Assignment Version - 2010)
+
+2. Sources:
+   (a) Creator & donor: Nicholas Kushmerick <nick@ucd.ie>
+   (c) Generated: April-July 1998
+
+   (a) Edited for assignment use: Toby Breckon
+       (all examples with missing data removed)
+
+3. Past Usage:
+   N. Kushmerick (1999). "Learning to remove Internet advertisements",
+   3rd Int Conf Autonomous Agents.  Available at
+   http://eprints.kfupm.edu.sa/48434/1/48434.pdf
+   Accuracy >97% using C4.5rules in predicting whether an image is an
+   advertisement.
+
+4. This dataset represents a set of possible advertisements on
+   Internet pages.  The features encode the geometry of the image
+   as well as phrases occuring in the URL, the image's URL and
+   alt text, the anchor text, and words occuring near the anchor text.
+   The task is to predict whether an image is an advertisement ("ad") or
+   not ("nonad").
+
+5. Number of Instances: 2359 (1978 nonads, 381 ads)
+
+6. Number of Attributes: 1558 (3 continous; others binary; this is the
+   "STANDARD encoding" mentioned in the [Kushmerick, 99].)
+   
+   N.B. In the original (not this) dataset - "One or more of 
+   the three continous features are missing in 28%
+   of the instances; missing values should be interpreted as "unknown"."
+   
+   These examples have been REMOVED and the Cranfield University
+   version of this dataset has no missing data.
+
+7. See [Kushmerick, 99] for further details of the attributes; in
+   ".names" format:
+
+   height: continuous. | possibly missing
+   width: continuous.  | possibly missing
+   aratio: continuous. | possibly missing
+   local: 0,1.
+   | 457 features from url terms, each of the form "url*term1+term2...";
+   | for example:
+   url*images+buttons: 0,1.
+     ...
+   | 495 features from origurl terms, in same form; for example:
+   origurl*labyrinth: 0,1.
+     ...
+   | 472 features from ancurl terms, in same form; for example:
+   ancurl*search+direct: 0,1.
+     ...
+   | 111 features from alt terms, in same form; for example:
+   alt*your: 0,1.
+     ...
+   | 19 features from caption terms
+   caption*and: 0,1.
+     ...
+
+8. Missing Attribute Values: None.
+
+9. Class Distribution: number of instances per class
+   (1978 nonads, 381 ads)
