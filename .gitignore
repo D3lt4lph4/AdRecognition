@@ -277,3 +277,5 @@ pdf/
 *.fls
 *.pdf
 *.fdb_latexmk
+
+tools
