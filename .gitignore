@@ -274,3 +274,6 @@ pdf/
 *.mtc1
 *.out
 *.synctex.gz
+*.fls
+*.pdf
+*.fdb_latexmk
