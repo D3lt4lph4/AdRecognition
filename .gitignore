@@ -279,3 +279,9 @@ pdf/
 *.fdb_latexmk
 
 tools
+
+Makefile
+
+CMakeCache
+
+CMakeFiles
