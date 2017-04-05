@@ -8,7 +8,8 @@ set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS}" )
 # linux specific stuff
 
 IF ( UNIX )
-   set( CMAKE_PREFIX_PATH "/opt/opencv-2.4.2" )
+   set( CMAKE_PREFIX_PATH "/d1/benjamin/opencv/opencv-2.4.13" )
+   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
    MESSAGE( "LINUX CONFIG" )
 ENDIF ( UNIX )
 
@@ -41,3 +42,11 @@ target_link_libraries(./bin/randomize ${OpenCV_LIBS} )
 project(./bin/selectlines)
 add_executable(./bin/selectlines ./src/selectlines.cpp)
 target_link_libraries(./bin/selectlines ${OpenCV_LIBS} )
+
+project(./bin/modelTester)
+add_executable(./bin/modelTester ./src/modelTester.cpp)
+target_link_libraries(./bin/modelTester ${OpenCV_LIBS} )
+
+project(./bin/selectRatio)
+add_executable(./bin/selectRatio ./src/selectRatio.cpp)
+target_link_libraries(./bin/selectRatio ${OpenCV_LIBS} )
