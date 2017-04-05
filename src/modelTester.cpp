@@ -6,6 +6,7 @@
 // for simple test of data reading run as "reader ad_cranfield.data ad_cranfield.data"
 // and set defintion below to 1 to print out input data
 
+
 /******************************************************************************/
 
 #include <cv.h>       // opencv general include file
@@ -15,20 +16,18 @@ using namespace cv; // OpenCV API is in the C++ "cv" namespace
 
 #include <stdio.h>
 
+
 /******************************************************************************/
 // global definitions (for speed and ease of use)
-
-#define NUMBER_OF_TRAINING_SAMPLES 2006
 #define ATTRIBUTES_PER_SAMPLE 1558
-#define NUMBER_OF_TESTING_SAMPLES 353
+#define NUMBER_OF_TESTING_SAMPLES 353  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
 
 #define NUMBER_OF_CLASSES 2
 /******************************************************************************/
 
 // loads the sample database from file (which is a CSV text file)
 
-int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples )
-{
+int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples ) {
   char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
   int valid;
 
@@ -72,85 +71,91 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
 
 int main( int argc, char** argv ) {
 
-  // define training data storage matrices (one for attribute examples, one
-  // for classifications)
-
-  Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
-
   //define testing data storage matrices
-
   Mat testing_data = Mat(NUMBER_OF_TESTING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
   Mat testing_classifications = Mat(NUMBER_OF_TESTING_SAMPLES, 1, CV_32FC1);
 
-  // define all the attributes as numerical (** not needed for all ML techniques **)
+  //Since polymorphisme is overrated (no function predict on the super class)
+  CvSVM model1;
+  CvRTrees model2;
+  CvANN_MLP model3;
 
-  Mat var_type = Mat(ATTRIBUTES_PER_SAMPLE + 1, 1, CV_8U );
-  var_type.setTo(Scalar(CV_VAR_NUMERICAL) ); // all inputs are numerical
+  long modelNumber = atoi(argv[3]);
 
-  // this is a classification problem so reset the last (+1) output
-  // var_type element to CV_VAR_CATEGORICAL (** not needed for all ML techniques **)
-
-  var_type.at<uchar>(ATTRIBUTES_PER_SAMPLE, 0) = CV_VAR_CATEGORICAL;
+  Mat test_sample;
+  int correct_class = 0;
+  int wrong_class = 0;
+  int false_positives [NUMBER_OF_CLASSES] = {0,0};
 
   double result;
-  // load training and testing data sets
 
-  if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
+  Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
+  Point max_loc = Point(0,0);
 
-    float priors[] = {1,1};  // weights of each classification for classes
-    // (all equal as equal samples of each digit)
+  if (read_data_from_csv(argv[1], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
+    switch (modelNumber) {
+      case 1:
+        model1.load(argv[2]);
+        break;
+      case 2:
+        model2.load(argv[2]);
+        break;
+      case 3:
+        model3.load(argv[2]);
+        break;
+      default:
+        std::cout << "Wrong model." << std::endl;
+        return 0;
+        break;
+    }
 
-    CvRTParams params = CvRTParams(100, // max depth
-      1, // min sample count
-      0, // regression accuracy: N/A here
-      false, // compute surrogate split, no missing data
-      15, // max number of categories (use sub-optimal algorithm for larger numbers)
-      priors, // the array of priors
-      false,  // calculate variable importance
-      0,       // number of variables randomly selected at node and used to find the best split(s).
-      100,	 // max number of trees in the forest
-      0.01f,				// forrest accuracy
-      CV_TERMCRIT_ITER |	CV_TERMCRIT_EPS // termination cirteria
-    );
-
-    // train random forest classifier (using training data)
-
-    printf( "\nUsing training database: %s\n\n", argv[1]);
-    CvRTrees* rtree = new CvRTrees;
-
-    rtree->train(training_data, CV_ROW_SAMPLE, training_classifications, Mat(), Mat(), var_type, Mat(), params);
-
-    // perform classifier testing and report results
-
-    Mat test_sample;
-    int correct_class = 0;
-    int wrong_class = 0;
-    int false_positives [NUMBER_OF_CLASSES] = {0,0};
-
-    printf( "\nUsing testing database: %s\n\n", argv[2]);
+    printf( "\nCalculating the class for each sample: %s\n\n", argv[2]);
 
     for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
+
       // extract a row from the testing matrix
       test_sample = testing_data.row(tsample);
 
-      // run random forest prediction
-      result = rtree->predict(test_sample, Mat());
-
-      // if the prediction and the (true) testing classification are the same
-      // (N.B. openCV uses a floating point decision tree implementation!)
-      if (result == testing_classifications.at<float>(tsample, 0)) {
-        correct_class++;
-      } else {
-        wrong_class++;
-        false_positives[(int) result]++;
+      // run the prediction
+      switch (modelNumber) {
+        case 1:
+          result = model1.predict(test_sample);
+          if (result == testing_classifications.at<float>(tsample, 0)) {
+            correct_class++;
+          } else {
+            wrong_class++;
+            false_positives[(int)(testing_classifications.at<float>(tsample, 0))]++;
+          }
+          break;
+        case 2:
+          result = model2.predict(test_sample);
+          if (result == testing_classifications.at<float>(tsample, 0)) {
+            correct_class++;
+          } else {
+            wrong_class++;
+            false_positives[(int)(testing_classifications.at<float>(tsample, 0))]++;
+          }
+          break;
+        case 3:
+          result = model3.predict(test_sample, classificationResult);
+          minMaxLoc(classificationResult, 0, 0, 0, &max_loc);
+          if (!(testing_classifications.at<float>(tsample, max_loc.x))) {
+            wrong_class++;
+            false_positives[(int) max_loc.x]++;
+          } else {
+            correct_class++;
+          }
+          break;
+        default:
+          return -1; //sould never go here;
+          break;
       }
     }
 
     printf( "\nResults on the testing database: %s\n"
     "\tCorrect classification: %d (%g%%)\n"
     "\tWrong classifications: %d (%g%%)\n",
-    argv[2],
+    argv[1],
     correct_class, (double) correct_class*100/NUMBER_OF_TESTING_SAMPLES,
     wrong_class, (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES);
 
@@ -159,17 +164,9 @@ int main( int argc, char** argv ) {
       false_positives[i],
       (double) false_positives[i]*100/NUMBER_OF_TESTING_SAMPLES);
     }
-
-    // all matrix memory freed by destructors
-    if (argc == 4) {
-      string file = "models/";
-      file.append(argv[3]);
-      std::cout << file << std::endl;
-      rtree->save(file.c_str());
-    }
-
     return 0;
   }
 
   return -1;
 }
+/******************************************************************************/
