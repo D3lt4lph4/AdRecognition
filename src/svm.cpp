@@ -106,8 +106,8 @@ int main( int argc, char** argv ) {
     1,				// SVM optimization parameter C
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
-    0,		  	// class wieghts (or priors)
-    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 1));
+    NULL,		  	// class wieghts (or priors)
+    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1));
 
     // train SVM classifier (using training data)
 
@@ -124,7 +124,7 @@ int main( int argc, char** argv ) {
     // (i.e. OpenCV 2.x) with 10 fold cross valdiation
     // N.B. this does not search kernel choice
 
-    svm->train_auto(training_data, training_classifications, Mat(), Mat(), params, 10);
+    svm->train_auto(training_data, training_classifications, Mat(), Mat(), params, 10, CvSVM::get_default_grid(CvSVM::C));
     params = svm->get_params();
     printf( "\nUsing optimal parameters degree %f, gamma %f, ceof0 %f\n\t C %f, nu %f, p %f\n Training ..", params.degree, params.gamma, params.coef0, params.C, params.nu, params.p);
     printf( ".... Done\n");
