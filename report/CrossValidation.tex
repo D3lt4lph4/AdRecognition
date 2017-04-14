@@ -1,0 +1,95 @@
+\chapter{Cross Validation}
+
+Finally we will use the crossValidation technique in order to improve our results. The principle of this technique is to cut down the training set into a bunch of smaller set in order to find the best working model over all the sets. We switch through the new ly creqted set to train and validate the model and finally we select the model with the smaller error. The following results will show the results on this method on the test set that was keep intact at the beggining in order to havve reliable results across all the outcome of the differents models.
+
+\section{SVM}
+
+For the SVM we will use the auto train function given in the Opencv library. As for the stopping point of the algorithm i will use both the max iteration and the epsilon accuracy. But one should keep in mind that this could mean awful result depending on the input since the algorithm tries to approach a maximum and might not reach it as fast as wanted depanding on the start point.
+
+\subsection{linear}
+
+The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations or 1 for epsilon.
+
+Results :
+\begin{itemize}
+  \item Correct classification : 90.085\%;
+  \item Wrong classification : 9.91501\%;
+  \item False positive non ad : 5.09915\%;
+  \item False positive ad : 4.81586\%.
+\end{itemize}
+
+
+\subsection{Polynomial}
+
+For this one, the number of itertion was reduced to 10000 because it was taking too much time.
+
+Results :
+\begin{itemize}
+  \item Correct classification : 87.5354\%;
+  \item Wrong classification : 12.4646\%;
+  \item False positive non ad : 8.2153\%;
+  \item False positive ad : 4.24929\%.
+\end{itemize}
+
+\subsection{Radial Basis Function}
+
+Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
+
+Results :
+\begin{itemize}
+  \item Correct classification : 93.2011\%;
+  \item Wrong classification : 6.79887\%;
+  \item False positive non ad : 0.566572\%;
+  \item False positive ad : 6.23229\%.
+\end{itemize}
+
+\subsection{Sigmoid}
+
+Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
+
+Results :
+\begin{itemize}
+  \item Correct classification : 88,9518\%;
+  \item Wrong classification : 11,0482\%;
+  \item False positive non ad : 4.53258\%;
+  \item False positive ad : 6.51558\%.
+\end{itemize}
+
+\section{Neural Network}
+For the neural network, the layers used are as follow :
+  \begin{itemize}
+    \item input layer, 1558, the number of point in the vector inputs;
+    \item output layer, 2 outputs the number of class;
+    \item hidden layer;
+  \end{itemize}
+  There will be no optimization on the number of cells used within the hidden layer and the number selected is of 40.
+
+  Results :
+  \begin{itemize}
+    \item Correct classification : 90.6516\%;
+    \item Wrong classification : 9.34844\%;
+    \item False positive non ad : 4.53258\%;
+    \item False positive ad : 4.81586\%.
+  \end{itemize}
+
+  Now, the previous resluts were obtained without randomizing the input samples. If we randomize then we get the following results :
+  \begin{itemize}
+    \item Correct classification : 91.7847\%;
+    \item Wrong classification : 8.2153\%;
+    \item False positive non ad : 2.26629\%;
+    \item False positive ad : 5.94901\%.
+  \end{itemize}
+
+  This results is logical because of the way the neural network is trained. Each in put is presented one after another and gradient is used to set the weight. Thus by showing one class after an other we risk to false the output by
+\section{Random forest}
+The parameters used for the random forest are the following :
+  \begin{itemize}
+    \item number of variable randomly selected sqrt(n) (usually the best number);
+  \end{itemize}
+Results :
+\begin{itemize}
+  \item Correct classification : 94.9008\%;
+  \item Wrong classification : 5.09915\%;
+  \item False positive non ad : 3.39943\%;
+  \item False positive ad : 1.69972\%.
+\end{itemize}
