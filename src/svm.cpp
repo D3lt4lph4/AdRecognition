@@ -99,10 +99,10 @@ int main( int argc, char** argv ) {
 
     CvSVMParams params = CvSVMParams(
     CvSVM::C_SVC,   // Type of SVM, here N classes (see manual)
-    CvSVM::POLY,  // kernel type (see manual)
-    1.0,			// kernel parameter (degree) for poly kernel only
+    CvSVM::SIGMOID,  // kernel type (see manual)
+    0.0,			// kernel parameter (degree) for poly kernel only
     1.0,			// kernel parameter (gamma) for poly/rbf kernel only
-    0.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
+    1.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
     1,				// SVM optimization parameter C
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
@@ -124,10 +124,11 @@ int main( int argc, char** argv ) {
     // (i.e. OpenCV 2.x) with 10 fold cross valdiation
     // N.B. this does not search kernel choice
 
-    svm->train_auto(training_data, training_classifications, Mat(), Mat(), params, 10, CvSVM::get_default_grid(CvSVM::C));
-    params = svm->get_params();
-    printf( "\nUsing optimal parameters degree %f, gamma %f, ceof0 %f\n\t C %f, nu %f, p %f\n Training ..", params.degree, params.gamma, params.coef0, params.C, params.nu, params.p);
-    printf( ".... Done\n");
+    //svm->train_auto(training_data, training_classifications, Mat(), Mat(), params, 10, CvSVM::get_default_grid(CvSVM::C));
+    svm->train(training_data, training_classifications, Mat(), Mat(), params);
+    // params = svm->get_params();
+    // printf( "\nUsing optimal parameters degree %f, gamma %f, ceof0 %f\n\t C %f, nu %f, p %f\n Training ..", params.degree, params.gamma, params.coef0, params.C, params.nu, params.p);
+    // printf( ".... Done\n");
 
     // get the number of support vectors used to define the SVM decision boundary
     printf("Number of support vectors for trained SVM = %i\n", svm->get_support_vector_count());

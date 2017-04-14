@@ -102,7 +102,7 @@ int main( int argc, char** argv ) {
     // (all equal as equal samples of each digit)
 
     CvRTParams params = CvRTParams(100, // max depth
-      1, // min sample count
+      20, // min sample count
       0, // regression accuracy: N/A here
       false, // compute surrogate split, no missing data
       15, // max number of categories (use sub-optimal algorithm for larger numbers)
