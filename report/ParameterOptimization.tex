@@ -2,7 +2,7 @@
 
 We've seen that the results after the simple approach (random choice of the parameter [either usual value or complete random]) can give good result but can also give under expectation ones depending on the method used.
 
-Thus we now try to optimize each parameter used for each methods in order to find the best value to use each time. On this section, the svm will be calculated using the function auto-train and a kfold segmentation of one to keep the sample intact and not gives them any advantages.
+Thus we now try to optimize each parameter used for each methods in order to find the best value to use each time. On this section, the svm will be calculated using the function auto-train and a kfold segmentation of two (one is not accepted) to keep the sample intact and not gives them any advantages.
 
 \section{SVM}
 
@@ -14,11 +14,15 @@ The first type of model used was the linear one. The stopping criteria was of ei
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.085\%;
-  \item Wrong classification : 9.91501\%;
-  \item False positive non ad : 5.09915\%;
-  \item False positive ad : 4.81586\%.
+  \item Correct classification : 83.8527\%;
+  \item Wrong classification : 16.1473\%;
+  \item False positive non ad : 0\%;
+  \item False positive ad : 16.1473\%.
 \end{itemize}
+Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
+	 C 0.100000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 1
 
 
 \subsection{Polynomial}
@@ -27,11 +31,15 @@ For this one, the number of itertion was keep at 1000 because it was taking too 
 
 Results :
 \begin{itemize}
-  \item Correct classification : 87.5354\%;
-  \item Wrong classification : 12.4646\%;
-  \item False positive non ad : 8.2153\%;
-  \item False positive ad : 4.24929\%.
+  \item Correct classification : 93.4844\%;
+  \item Wrong classification : 6.51558\%;
+  \item False positive non ad : 1.13314\%;
+  \item False positive ad : 5.38244\%.
 \end{itemize}
+Using optimal parameters degree 3.430000, gamma 0.000010, ceof0 0.100000
+	 C 0.500000, nu 0.000000, p 0.000000
+   Number of support vectors for trained SVM = 432
+
 
 \subsection{Radial Basis Function}
 
@@ -39,11 +47,16 @@ We keep 1000 iterations.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 93.2011\%;
-  \item Wrong classification : 6.79887\%;
+  \item Correct classification : 91.2181\%;
+  \item Wrong classification : 8.78187\%;
   \item False positive non ad : 0.566572\%;
-  \item False positive ad : 6.23229\%.
+  \item False positive ad : 8.2153\%.
 \end{itemize}
+
+Using optimal parameters degree 0.000000, gamma 0.033750, ceof0 0.000000
+	 C 12.500000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 877
 
 \subsection{Sigmoid}
 
@@ -51,11 +64,16 @@ Still a 1000 iterations
 
 Results :
 \begin{itemize}
-  \item Correct classification : 88,9518\%;
-  \item Wrong classification : 11,0482\%;
-  \item False positive non ad : 4.53258\%;
-  \item False positive ad : 6.51558\%.
+  \item Correct classification : 86.4023\%;
+  \item Wrong classification : 13.5977\%;
+  \item False positive non ad : 6.79887\%;
+  \item False positive ad : 6.79887\%.
 \end{itemize}
+Using optimal parameters degree 0.000000, gamma 0.000150, ceof0 0.100000
+	 C 0.500000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 313
+
 
 \section{Neural Network}
 For the neural network, the layers used are as follow :
