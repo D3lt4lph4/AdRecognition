@@ -75,6 +75,34 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
   return 1; // all OK
 }
 
+std::vector<float> getMeans(Mat data) {
+  std::vector<float> means;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + data.at<float>(r,c);
+    }
+    means.push_back(sum / data.rows);
+    sum = 0;
+  }
+  return means;
+}
+
+std::vector<float> getSTD(Mat data, std::vector<float> means) {
+  std::vector<float> std;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
+    }
+    // std::cout << sqrt(sum / data.rows) << std::endl;
+    std.push_back(sqrt(sum / data.rows));
+    sum = 0;
+  }
+  return std;
+}
 /******************************************************************************/
 
 int main( int argc, char** argv ) {
@@ -82,6 +110,7 @@ int main( int argc, char** argv ) {
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
   int numberOfIterations = 10, paramMin = 10, paramMax = 1000, step = (paramMin + paramMax) / numberOfIterations,optimumParam = 0;
+  std::vector<float> means, std;
 
   Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
   Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
@@ -110,8 +139,27 @@ int main( int argc, char** argv ) {
 
   if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
 
+    means = getMeans(training_data);
+    std = getSTD(training_data, means);
+    //normalizing the training data
+    for (int c = 0; c < training_data.cols ; c++) {
+      for (int r = 0; r < training_data.rows ; r++) {
+        if (std.at(c) != 0) {
+          training_data.at<float>(r,c) = (training_data.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
+
+    //normalizing the testing data
+    for (int c = 0; c < testing_data.cols ; c++) {
+      for (int r = 0; r < testing_data.rows ; r++) {
+        if (std.at(c) != 0) {
+          testing_data.at<float>(r,c) = (testing_data.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
     myfile.open(csv);
-    float priors[] = {1,1};  // weights of each classification for classes
+    float priors[] = {0.85,0.15};  // weights of each classification for classes
     // (all equal as equal samples of each digit)
     for (int i = 0; i < numberOfIterations; i++) {
       //std::cout << i << std::endl;
@@ -158,7 +206,7 @@ int main( int argc, char** argv ) {
           correct_class++;
         } else {
           wrong_class++;
-          false_positives[(int) result]++;
+          false_positives[(int)result]++;
         }
       }
 

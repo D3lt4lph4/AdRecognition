@@ -80,13 +80,41 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
   return 1; // all OK
 }
 
+std::vector<float> getMeans(Mat data) {
+  std::vector<float> means;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + data.at<float>(r,c);
+    }
+    means.push_back(sum / data.rows);
+    sum = 0;
+  }
+  return means;
+}
+
+std::vector<float> getSTD(Mat data, std::vector<float> means) {
+  std::vector<float> std;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
+    }
+    // std::cout << sqrt(sum / data.rows) << std::endl;
+    std.push_back(sqrt(sum / data.rows));
+    sum = 0;
+  }
+  return std;
+}
 /******************************************************************************/
 
 int main( int argc, char** argv ) {
 
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
-
+  std::vector<float> means, std;
   Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
   Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
 
@@ -103,16 +131,42 @@ int main( int argc, char** argv ) {
 
   if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
 
+    means = getMeans(training_data);
+    std = getSTD(training_data, means);
+    //normalizing the training data
+    for (int c = 0; c < training_data.cols ; c++) {
+      for (int r = 0; r < training_data.rows ; r++) {
+        if (std.at(c) != 0) {
+          training_data.at<float>(r,c) = (training_data.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
+
+    //normalizing the testing data
+    for (int c = 0; c < testing_data.cols ; c++) {
+      for (int r = 0; r < testing_data.rows ; r++) {
+        if (std.at(c) != 0) {
+          testing_data.at<float>(r,c) = (testing_data.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
+
+    //Setting priors for svm
+    Mat priors = Mat(1,2, CV_32FC1);
+    priors.at<float>(0,0) = 0.85;
+    priors.at<float>(0,1) = 0.15;
+    CvMat* pri = new CvMat(priors);
+
     CvSVMParams params = CvSVMParams(
     CvSVM::C_SVC,   // Type of SVM, here N classes (see manual)
     CvSVM::SIGMOID,  // kernel type (see manual)
     1.0,			// kernel parameter (degree) for poly kernel only
     1.0,			// kernel parameter (gamma) for poly/rbf kernel only
-    0.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
+    1.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
     1,				// SVM optimization parameter C
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
-    NULL,		  	// class wieghts (or priors)
+    pri,		  	// class wieghts (or priors)
     cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.001));
 
     // train SVM classifier (using training data)
@@ -151,9 +205,9 @@ int main( int argc, char** argv ) {
     }
 
     printf( "\nUsing testing database: %s\n\n", argv[2]);
-
+    int test = 0;
     for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
-
+      test++;
       // extract a row from the testing matrix
       test_sample = testing_data.row(tsample);
 
@@ -162,9 +216,10 @@ int main( int argc, char** argv ) {
 
       if (result == testing_classifications.at<float>(tsample, 0)) {
         correct_class++;
+
       } else {
         wrong_class++;
-        false_positives[(int) (testing_classifications.at<float>(tsample, 0))]++;
+        false_positives[(int)result]++;
       }
     }
 
@@ -176,16 +231,16 @@ int main( int argc, char** argv ) {
     wrong_class, (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES);
 
     printf( "\tClass (non-ad) false postives 	%d (%g%%)\n",false_positives[ 0],(double)false_positives[0]*100/NUMBER_OF_TESTING_SAMPLES);
-    printf( "\tClass (non-ad) false postives 	%d (%g%%)\n",false_positives[ 1],(double)false_positives[1]*100/NUMBER_OF_TESTING_SAMPLES);
+    printf( "\tClass (ad) false postives 	%d (%g%%)\n",false_positives[ 1],(double)false_positives[1]*100/NUMBER_OF_TESTING_SAMPLES);
 
     // all matrix memory freed by destructors
     if (argc == 4) {
       string file = "models/";
       file.append(argv[3]);
+      file.append(".xml");
       std::cout << file << std::endl;
       svm->save(file.c_str());
     }
-
     return 0;
   }
 
