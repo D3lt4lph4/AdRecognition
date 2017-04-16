@@ -49,7 +49,10 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
       if (attribute == ATTRIBUTES_PER_SAMPLE) {
 
         // last attribute is the class
-        fscanf(f, "%s.\n", tmps);
+        if(fscanf(f, "%s.\n", tmps) !=1) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
+        }
 
         if (strcmp(tmps, "ad.") == 0) {
           // adverts are class 1
@@ -65,7 +68,10 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
       else {
         // store all other data as floating point
 
-        fscanf(f, "%f,", &(data.at<float>(line, attribute)));
+        if (fscanf(f, "%f,", &(data.at<float>(line, attribute))) != 1) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
+        }
       }
     }
   }

@@ -32,7 +32,6 @@ using namespace cv; // OpenCV API is in the C++ "cv" namespace
 int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples )
 {
   char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
-  int valid;
 
   // if we can't read the input file then return 0
   FILE* f = fopen( filename, "r" );
@@ -49,7 +48,10 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
       if (attribute == ATTRIBUTES_PER_SAMPLE) {
 
         // last attribute is the class
-        valid = fscanf(f, "%s.\n", tmps); //valid to be handle
+        if (fscanf(f, "%s.\n", tmps) != 1) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
+        }
 
         if (strcmp(tmps, "ad.") == 0) { // adverts are class 1
 
@@ -61,7 +63,10 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
         }
       } else {
         // store all other data as floating point
-        valid = fscanf(f, "%f,", &(data.at<float>(line, attribute))); //valid to be handle
+        if (fscanf(f, "%f,", &(data.at<float>(line, attribute))) != 1 ) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
+        }
       }
     }
   }
@@ -76,7 +81,7 @@ int main( int argc, char** argv ) {
 
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
-  int numberOfIterations = 2, paramMin = 10, paramMax = 1000, step = (paramMin + paramMax) / numberOfIterations;
+  int numberOfIterations = 10, paramMin = 10, paramMax = 1000, step = (paramMin + paramMax) / numberOfIterations,optimumParam = 0;
 
   Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
   Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
@@ -99,11 +104,13 @@ int main( int argc, char** argv ) {
   double result, currentError = 0, errorMin = 0;
   // load training and testing data sets
   std::ofstream myfile;
-
+  string csv = "csv/";
+  csv.append(argv[3]);
+  csv.append(".csv");
 
   if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
 
-    myfile.open (argv[3]);
+    myfile.open(csv);
     float priors[] = {1,1};  // weights of each classification for classes
     // (all equal as equal samples of each digit)
     for (int i = 0; i < numberOfIterations; i++) {
@@ -170,10 +177,13 @@ int main( int argc, char** argv ) {
 
       if (errorMin == 0) {
         errorMin = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
+        currentError = errorMin;
       } else {
         currentError = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
       }
 
+      std::cout << errorMin << std::endl;
+      std::cout << currentError << std::endl;
       //write to file for display
       myfile << paramMin + i * step;
       myfile << ",";
@@ -181,12 +191,17 @@ int main( int argc, char** argv ) {
       myfile << ";\n";
 
       // all matrix memory freed by destructors
-      if (argc == 4 && currentError < errorMin) {
+      if (argc == 4 && currentError <= errorMin) {
         string file = "models/";
         file.append(argv[3]);
+        file.append(".xml");
         std::cout << file << std::endl;
         rtree->save(file.c_str());
+        errorMin = currentError;
+        optimumParam = paramMin + i * step;
       }
+      std::cout << optimumParam << std::endl;
+      // all OK : main returns 0
 
     }
 
