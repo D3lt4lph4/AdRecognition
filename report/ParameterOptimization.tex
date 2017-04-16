@@ -80,21 +80,24 @@ For the neural network, the layers used are as follow :
   \begin{itemize}
     \item input layer, 1558, the number of point in the vector inputs;
     \item output layer, 2 outputs the number of class;
-    \item hidden layer, 20 neurons;
+    \item hidden layer, this is the parameter we seek to optimize;
   \end{itemize}
 
  For this model only the number of cell in the hidden layer will be optimized, not the number of hidden layer (doc here). And the data will be randomized before use. The result shown are with the best parameter each time.
 
   Results :
   \begin{itemize}
-    \item Correct classification : 90.6516\%;
-    \item Wrong classification : 9.34844\%;
-    \item False positive non ad : 4.53258\%;
+    \item Correct classification : 92.6346\%;
+    \item Wrong classification : 7.36544\%;
+    \item False positive non ad : 2.54958\%;
     \item False positive ad : 4.81586\%.
   \end{itemize}
 
-%Here ut figure with the error
-%Some explanation
+  \begin{figure}[h]
+   \centering
+   \includegraphics[scale=0.5]{../images/NNPO.png}
+   \caption{Class diagram}
+  \end{figure}
 
 \section{Random forest}
 For the random forrest i only played with the following parameter as it's the same with more, only giving more calculations :
@@ -103,8 +106,14 @@ For the random forrest i only played with the following parameter as it's the sa
   \end{itemize}
 Results :
 \begin{itemize}
-  \item Correct classification : 94.9008\%;
-  \item Wrong classification : 5.09915\%;
-  \item False positive non ad : 3.39943\%;
-  \item False positive ad : 1.69972\%.
+  \item Correct classification : 95.7507\%;
+  \item Wrong classification : 4.24929\%;
+  \item False positive non ad : 1.41643\%;
+  \item False positive ad : 2.83286\%.
 \end{itemize}
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=0.5]{../images/RFPO.png}
+ \caption{Class diagram}
+\end{figure}
