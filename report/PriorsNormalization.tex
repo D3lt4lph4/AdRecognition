@@ -14,24 +14,34 @@ The first type of model used was the linear one. The stopping criteria was of ei
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.085\%;
-  \item Wrong classification : 9.91501\%;
-  \item False positive non ad : 5.09915\%;
-  \item False positive ad : 4.81586\%.
+  \item Correct classification : 91.7847\%;
+  \item Wrong classification : 8.2153\%;
+  \item False positive non ad : 7.08215\%;
+  \item False positive ad : 1.13314\%.
 \end{itemize}
 
+Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
+Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
+	 C 0.100000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 1
 
 \subsection{Polynomial}
 
-For this one, the number of itertion was reduced to 10000 because it was taking too much time.
+For this one, the number of itertion was reduced to 1000 because it was taking too much time.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 87.5354\%;
-  \item Wrong classification : 12.4646\%;
+  \item Correct classification : 90.3683\%;
+  \item Wrong classification : 9.63173\%;
   \item False positive non ad : 8.2153\%;
-  \item False positive ad : 4.24929\%.
+  \item False positive ad : 1.41643\%.
 \end{itemize}
+Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
+Using optimal parameters degree 0.490000, gamma 0.506250, ceof0 274.400000
+	 C 2.500000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 190
 
 \subsection{Radial Basis Function}
 
@@ -39,11 +49,17 @@ Since the result on the first model were not good enough I tried an other one, t
 
 Results :
 \begin{itemize}
-  \item Correct classification : 93.2011\%;
-  \item Wrong classification : 6.79887\%;
-  \item False positive non ad : 0.566572\%;
-  \item False positive ad : 6.23229\%.
+  \item Correct classification : 91.2181\%;
+  \item Wrong classification : 8.78187\%;
+  \item False positive non ad : 7.93201\%;
+  \item False positive ad : 0.849858\%.
 \end{itemize}
+Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
+Using optimal parameters degree 0.000000, gamma 0.000150, ceof0 0.000000
+	 C 62.500000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 388
+
 
 \subsection{Sigmoid}
 
@@ -51,11 +67,16 @@ Since the result on the first model were not good enough I tried an other one, t
 
 Results :
 \begin{itemize}
-  \item Correct classification : 88,9518\%;
-  \item Wrong classification : 11,0482\%;
-  \item False positive non ad : 4.53258\%;
-  \item False positive ad : 6.51558\%.
+  \item Correct classification : 83.8527\%;
+  \item Wrong classification : 16.1473\%;
+  \item False positive non ad : 16.1473\%;
+  \item False positive ad : 0\%.
 \end{itemize}
+Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
+Using optimal parameters degree 0.000000, gamma 0.000010, ceof0 0.100000
+	 C 0.100000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 382
 
 \section{Neural Network}
 For the neural network, the layers used are as follow :
@@ -68,21 +89,16 @@ For the neural network, the layers used are as follow :
 
   Results :
   \begin{itemize}
-    \item Correct classification : 90.6516\%;
-    \item Wrong classification : 9.34844\%;
-    \item False positive non ad : 4.53258\%;
-    \item False positive ad : 4.81586\%.
+    \item Correct classification : 92.9178\%;
+    \item Wrong classification : 7.08215\%;
+    \item False positive non ad : 3.11615\%;
+    \item False positive ad : 3.96601\%.
   \end{itemize}
+  7.08215
+  7.08215
+  models/NNPriRan.xml
+  80
 
-  Now, the previous resluts were obtained without randomizing the input samples. If we randomize then we get the following results :
-  \begin{itemize}
-    \item Correct classification : 91.7847\%;
-    \item Wrong classification : 8.2153\%;
-    \item False positive non ad : 2.26629\%;
-    \item False positive ad : 5.94901\%.
-  \end{itemize}
-
-  This results is logical because of the way the neural network is trained. Each in put is presented one after another and gradient is used to set the weight. Thus by showing one class after an other we risk to false the output by
 \section{Random forest}
 The parameters used for the random forest are the following :
   \begin{itemize}
@@ -96,100 +112,12 @@ Results :
   \item False positive ad : 1.69972\%.
 \end{itemize}
 
-\chapter{Normalization}
-
-Here we normalize the data in order to see some significant modifications in the output.
-
-\section{SVM}
-
-Since we don't want to get the svm to be one step ahead of the other methods we will not use the auto train method of the svm class. We will select the parameter value as "in between value" to see what we can get, but since they are selected at my appreciation, the result might be very poor for this part.
-For the svm only the Support Vector Classification will be used, but each kernel will be tested.
-
-
-\subsection{linear}
-
-The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations or 1 for epsilon.
-
-Results :
-\begin{itemize}
-  \item Correct classification : 90.085\%;
-  \item Wrong classification : 9.91501\%;
-  \item False positive non ad : 5.09915\%;
-  \item False positive ad : 4.81586\%.
-\end{itemize}
-
-
-\subsection{Polynomial}
-
-For this one, the number of itertion was reduced to 10000 because it was taking too much time.
-
-Results :
-\begin{itemize}
-  \item Correct classification : 87.5354\%;
-  \item Wrong classification : 12.4646\%;
-  \item False positive non ad : 8.2153\%;
-  \item False positive ad : 4.24929\%.
-\end{itemize}
-
-\subsection{Radial Basis Function}
-
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
-
-Results :
-\begin{itemize}
-  \item Correct classification : 93.2011\%;
-  \item Wrong classification : 6.79887\%;
-  \item False positive non ad : 0.566572\%;
-  \item False positive ad : 6.23229\%.
-\end{itemize}
-
-\subsection{Sigmoid}
-
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
-
-Results :
-\begin{itemize}
-  \item Correct classification : 88,9518\%;
-  \item Wrong classification : 11,0482\%;
-  \item False positive non ad : 4.53258\%;
-  \item False positive ad : 6.51558\%.
-\end{itemize}
-
-\section{Neural Network}
-For the neural network, the layers used are as follow :
-  \begin{itemize}
-    \item input layer, 1558, the number of point in the vector inputs;
-    \item output layer, 2 outputs the number of class;
-    \item hidden layer;
-  \end{itemize}
-  There will be no optimization on the number of cells used within the hidden layer and the number selected is of 40.
-
-  Results :
-  \begin{itemize}
-    \item Correct classification : 90.6516\%;
-    \item Wrong classification : 9.34844\%;
-    \item False positive non ad : 4.53258\%;
-    \item False positive ad : 4.81586\%.
-  \end{itemize}
-
-  Now, the previous resluts were obtained without randomizing the input samples. If we randomize then we get the following results :
-  \begin{itemize}
-    \item Correct classification : 91.7847\%;
-    \item Wrong classification : 8.2153\%;
-    \item False positive non ad : 2.26629\%;
-    \item False positive ad : 5.94901\%.
-  \end{itemize}
-
-  This results is logical because of the way the neural network is trained. Each in put is presented one after another and gradient is used to set the weight. Thus by showing one class after an other we risk to false the output by
-\section{Random forest}
-The parameters used for the random forest are the following :
-  \begin{itemize}
-    \item number of variable randomly selected sqrt(n) (usually the best number);
-  \end{itemize}
-Results :
-\begin{itemize}
-  \item Correct classification : 94.9008\%;
-  \item Wrong classification : 5.09915\%;
-  \item False positive non ad : 3.39943\%;
-  \item False positive ad : 1.69972\%.
-\end{itemize}
+Results on the testing database: data/ad_cranfieldSub.test
+	Correct classification: 330 (93.4844%)
+	Wrong classifications: 23 (6.51558%)
+	Class (digit 0) false postives 	21 (5.94901%)
+	Class (digit 1) false postives 	2 (0.566572%)
+7.36544
+6.51558
+models/RFPriRan.xml
+818
