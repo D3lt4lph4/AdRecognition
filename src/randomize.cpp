@@ -21,8 +21,7 @@ using namespace std;
 
 /******************************************************************************/
 
-int main( int argc, char** argv )
-{
+int main( int argc, char** argv ) {
 
 	vector<char *> inputlines; 				// vector of input lines
 	vector<char *>::iterator outline;		// iterator for above
@@ -32,7 +31,7 @@ int main( int argc, char** argv )
 	// open input file
 
 	FILE* fi = fopen( argv[1], "r" );
-	if( !fi ){
+	if( !fi ) {
 		printf("ERROR: cannot read input file %s\n",  argv[1]);
 		return -1; // all not OK
 	}
@@ -40,15 +39,14 @@ int main( int argc, char** argv )
 	// open output file
 
 	FILE* fw = fopen( argv[2], "w" );
-	if( !fw ){
+	if( !fw ) {
 		printf("ERROR: cannot read output file %s\n",  argv[2]);
 		return -1; // all not OK
 	}
 
 	// read in all the lines of the file (allocating fresh memory for each)
 
-	while (!feof(fi))
-	{
+	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
 		fscanf(fi, "%[^\n]\n", line);
 		inputlines.push_back(line);
@@ -61,19 +59,16 @@ int main( int argc, char** argv )
 	// second edition. Addison-Wesley, 1981). Knuth credits Moses and
 	// Oakford (1963) and Durstenfeld (1964)."
 	// - SGI STL manual, http://www.sgi.com/tech/stl/random_shuffle.html
-
 	random_shuffle(inputlines.begin(), inputlines.end());
 
 	// output all of the lines to output file
 
-	for(outline = inputlines.begin(); outline < inputlines.end(); outline++)
-	{
+	for(outline = inputlines.begin(); outline < inputlines.end(); outline++) {
 		fprintf(fw, "%s\n", *outline);
 		free((void *) *outline); // free memory also
 	}
 
 	// close files
-
 	fclose(fi);
 	fclose(fw);
 

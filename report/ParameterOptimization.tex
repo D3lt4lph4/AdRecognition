@@ -10,31 +10,31 @@ For the SVM we will use the auto train function given in the Opencv library. As 
 
 \subsection{linear}
 
-The first type of model used was the linear one. The stopping criteria was of either a 1000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 1 for epsilon.
+The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 1 for epsilon.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 83.8527\%;
-  \item Wrong classification : 16.1473\%;
-  \item False positive non ad : 0\%;
-  \item False positive ad : 16.1473\%.
+  \item Correct classification : 90.08\%;
+  \item Wrong classification : 9.92\%;
+  \item False positive non ad : 4.82\%;
+  \item False positive ad : 5.10\%.
 \end{itemize}
 Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
-	 C 0.100000, nu 0.000000, p 0.000000
+	 C 0.500000, nu 0.000000, p 0.000000
  Training ...... Done
 Number of support vectors for trained SVM = 1
-
+100000
 
 \subsection{Polynomial}
 
-For this one, the number of itertion was keep at 1000 because it was taking too much time.
+For this one, the number of itertion was keep at 10000 because it was taking too much time.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 93.4844\%;
-  \item Wrong classification : 6.51558\%;
-  \item False positive non ad : 1.13314\%;
-  \item False positive ad : 5.38244\%.
+  \item Correct classification : 93.48\%;
+  \item Wrong classification : 6.52\%;
+  \item False positive non ad : 5.67\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
 Using optimal parameters degree 3.430000, gamma 0.000010, ceof0 0.100000
 	 C 0.500000, nu 0.000000, p 0.000000
@@ -47,10 +47,10 @@ We keep 1000 iterations.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.2181\%;
-  \item Wrong classification : 8.78187\%;
-  \item False positive non ad : 0.566572\%;
-  \item False positive ad : 8.2153\%.
+  \item Correct classification : 91.22\%;
+  \item Wrong classification : 8.78\%;
+  \item False positive non ad : 8.22\%;
+  \item False positive ad : 0.57\%.
 \end{itemize}
 
 Using optimal parameters degree 0.000000, gamma 0.033750, ceof0 0.000000
@@ -87,12 +87,13 @@ For the neural network, the layers used are as follow :
 
   Results :
   \begin{itemize}
-    \item Correct classification : 92.6346\%;
-    \item Wrong classification : 7.36544\%;
-    \item False positive non ad : 2.54958\%;
-    \item False positive ad : 4.81586\%.
+    \item Correct classification : 93.2\%;
+    \item Wrong classification : 6.80\%;
+    \item False positive non ad : 3.34\%;
+    \item False positive ad : 3.34\%.
   \end{itemize}
 
+40
   \begin{figure}[h]
    \centering
    \includegraphics[scale=0.5]{../images/NNPO.png}
@@ -108,8 +109,8 @@ Results :
 \begin{itemize}
   \item Correct classification : 95.7507\%;
   \item Wrong classification : 4.24929\%;
-  \item False positive non ad : 1.41643\%;
-  \item False positive ad : 2.83286\%.
+  \item False positive non ad : 2.83286\%;
+  \item False positive ad : 1.41643\%.
 \end{itemize}
 
 \begin{figure}[h]

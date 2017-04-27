@@ -16,10 +16,10 @@ The first type of model used was the linear one. The parameter C was set to 1;
 
 Results :
 \begin{itemize}
-  \item Correct classification : 81.8697\%;
-  \item Wrong classification : 18.1303\%;
-  \item False positive non ad : 2.83286\%;
-  \item False positive ad : 15.2975\%.
+  \item Correct classification : 81.87\%;
+  \item Wrong classification : 18.13\%;
+  \item False positive non ad : 15.30\%;
+  \item False positive ad : 2.83\%.
 \end{itemize}
 
 We can see that we get not so bad results with 81\% of good classification. Also we can notice that this classifier is best to find the non-ad since it only has 2.8\% of miss classification against 15\%.
@@ -29,10 +29,10 @@ The parameter degree was set to 15, gamma to 1 and coeff0 to 1.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 34.5609\%;
-  \item Wrong classification : 65.4391\%;
-  \item False positive non ad : 52.1246\%;
-  \item False positive ad : 13.3144\%.
+  \item Correct classification : 34.56\%;
+  \item Wrong classification : 65.44\%;
+  \item False positive non ad : 13.31\%;
+  \item False positive ad : 52.12\%.
 \end{itemize}
 
 This classifier seems to be worse than the previous, only 34.6\% of correctly cassified sample, but on the other hand it has less false positives on the ad class (which might not be what one would want).
@@ -42,10 +42,10 @@ This classifier seems to be worse than the previous, only 34.6\% of correctly ca
 For this classifier, gamma was set to 1.
 Results :
 \begin{itemize}
-  \item Correct classification : 90.3683\%;
-  \item Wrong classification : 9.63173\%;
-  \item False positive non ad : 0.566572\%;
-  \item False positive ad : 9.06516\%.
+  \item Correct classification : 90.37\%;
+  \item Wrong classification : 9.63\%;
+  \item False positive non ad : 9.06\%;
+  \item False positive ad : 0.57\%.
 \end{itemize}
 
 This is the best classifier so far, with almost no false positive on the non ad. Still this may not be the classifier a website would want because it confuses non-ad for ad.
@@ -55,10 +55,10 @@ This is the best classifier so far, with almost no false positive on the non ad.
 gamma set to 1, coef0 set to 1 and c set to 1.
 Results :
 \begin{itemize}
-  \item Correct classification : 16.1473\%;
-  \item Wrong classification : 83.8527\%;
-  \item False positive non ad : 83.8527\%;
-  \item False positive ad : 0\%.
+  \item Correct classification : 16.15\%;
+  \item Wrong classification : 83.85\%;
+  \item False positive non ad : 0\%;
+  \item False positive ad : 83.85\%.
 \end{itemize}
 
 This is probably the worst classifier so far if we look at the number, yet if you want to be sure not mistake a non-ad for an ad this is the one to pick among the smv classifier.
@@ -74,10 +74,10 @@ For the neural network, the layers used are as follow :
 
   Results :
   \begin{itemize}
-    \item Correct classification : 91.2181\%;
-    \item Wrong classification : 8.78187\%;
-    \item False positive non ad : 3.96601\%;
-    \item False positive ad : 4.81586\%.
+    \item Correct classification : 92.22\%;
+    \item Wrong classification : 7.08\%;
+    \item False positive non ad : 4.25\%;
+    \item False positive ad : 2.83\%.
   \end{itemize}
 
 
@@ -89,11 +89,11 @@ The parameters used for the random forest are the following :
       \item number of trees within the forest : 100,
       \item number of variable randomly selected sqrt(n) (usually the best number);
   \end{itemize}
-  
+
 Results :
 \begin{itemize}
-  \item Correct classification : 95.1841\%;
-  \item Wrong classification : 4.81586\%;
-  \item False positive non ad : 3.68272\%;
-  \item False positive ad : 1.13314\%.
+  \item Correct classification : 90.93\%;
+  \item Wrong classification : 9.07\%;
+  \item False positive non ad : 8.50\%;
+  \item False positive ad : 0.57\%.
 \end{itemize}

@@ -1,5 +1,5 @@
 // Example : ML assignment data reader 2011
-// usage: prog training_data_file testing_data_file
+// usage: prog trainingData_file validationData_file
 
 // For use with testing/training datasets of the same format as: ad_cranfield.data
 
@@ -22,15 +22,14 @@ using namespace cv; // OpenCV API is in the C++ "cv" namespace
 
 #define NUMBER_OF_TRAINING_SAMPLES 2006
 #define ATTRIBUTES_PER_SAMPLE 1558
-#define NUMBER_OF_TESTING_SAMPLES 353
+#define NUMBER_OF_VALIDATION_SAMPLES 353
 
 #define NUMBER_OF_CLASSES 2
 /******************************************************************************/
 
 // loads the sample database from file (which is a CSV text file)
 
-int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples )
-{
+int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples ) {
   char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
 
   // if we can't read the input file then return 0
@@ -107,68 +106,104 @@ std::vector<float> getSTD(Mat data, std::vector<float> means) {
 
 int main( int argc, char** argv ) {
 
-  // define training data storage matrices (one for attribute examples, one
-  // for classifications)
-  int numberOfIterations = 10, paramMin = 10, paramMax = 1000, step = (paramMin + paramMax) / numberOfIterations,optimumParam = 0;
-  std::vector<float> means, std;
+  Mat trainingData = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat trainingClassifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
 
-  Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
-
-  //define testing data storage matrices
-
-  Mat testing_data = Mat(NUMBER_OF_TESTING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat testing_classifications = Mat(NUMBER_OF_TESTING_SAMPLES, 1, CV_32FC1);
+  //define validation data storage matrices
+  Mat validationData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat validationClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, 1, CV_32FC1);
 
   // define all the attributes as numerical (** not needed for all ML techniques **)
+  Mat varType = Mat(ATTRIBUTES_PER_SAMPLE + 1, 1, CV_8U );
+  varType.setTo(Scalar(CV_VAR_NUMERICAL) ); // all inputs are numerical
 
-  Mat var_type = Mat(ATTRIBUTES_PER_SAMPLE + 1, 1, CV_8U );
-  var_type.setTo(Scalar(CV_VAR_NUMERICAL) ); // all inputs are numerical
+  varType.at<uchar>(ATTRIBUTES_PER_SAMPLE, 0) = CV_VAR_CATEGORICAL;
 
-  // this is a classification problem so reset the last (+1) output
-  // var_type element to CV_VAR_CATEGORICAL (** not needed for all ML techniques **)
+  Mat validationSample;
+  int correctClass = 0, wrongClass = 0, falsePositives[NUMBER_OF_CLASSES] = {0,0};
 
-  var_type.at<uchar>(ATTRIBUTES_PER_SAMPLE, 0) = CV_VAR_CATEGORICAL;
+  std::vector<float> means, std;
+
+  int numberOfIterations = 10, paramMin = 100, step = 100, optimumParam = 0;
 
   double result, currentError = 0, errorMin = 0;
-  // load training and testing data sets
-  std::ofstream myfile;
-  string csv = "csv/";
-  csv.append(argv[3]);
-  csv.append(".csv");
 
-  if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
+  //Setting precision for display
+  std::cout.precision(4);
 
-    means = getMeans(training_data);
-    std = getSTD(training_data, means);
+  //Creating files to write the data to, will then be used for modelTester (model only, no training)
+  std::ofstream csvFile, statFile;
+  string csvName = "data/csv/", statsName = "data/stats/", file = "data/models/";
+
+  //If model to save
+  if (argc == 4) {
+    //File for model
+    file.append(argv[3]);
+    file.append(".xml");
+
+    csvName.append(argv[3]);
+    statsName.append(argv[3]);
+    csvName.append(".csv");
+    statsName.append(".stats");
+  }
+
+  if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], validationData, validationClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
+
+    //We open the files to save data if requested
+    if (argc == 4) {
+      csvFile.open(csvName, std::ofstream::out | std::ofstream::trunc);
+      statFile.open(statsName, std::ofstream::out | std::ofstream::trunc);
+    }
+
+    //We calculate the mean and variance for normalization
+    means = getMeans(trainingData);
+    std = getSTD(trainingData, means);
+
     //normalizing the training data
-    for (int c = 0; c < training_data.cols ; c++) {
-      for (int r = 0; r < training_data.rows ; r++) {
+    for (int c = 0; c < trainingData.cols ; c++) {
+      for (int r = 0; r < trainingData.rows ; r++) {
         if (std.at(c) != 0) {
-          training_data.at<float>(r,c) = (training_data.at<float>(r,c) - means.at(c)) / std.at(c);
+          trainingData.at<float>(r,c) = (trainingData.at<float>(r,c) - means.at(c)) / std.at(c);
         }
       }
     }
 
     //normalizing the testing data
-    for (int c = 0; c < testing_data.cols ; c++) {
-      for (int r = 0; r < testing_data.rows ; r++) {
+    for (int c = 0; c < validationData.cols ; c++) {
+      for (int r = 0; r < validationData.rows ; r++) {
         if (std.at(c) != 0) {
-          testing_data.at<float>(r,c) = (testing_data.at<float>(r,c) - means.at(c)) / std.at(c);
+          validationData.at<float>(r,c) = (validationData.at<float>(r,c) - means.at(c)) / std.at(c);
         }
       }
     }
-    myfile.open(csv);
+
+    //Writing the stats to file
+    if (argc == 4) {
+      statFile << means.size() << " " << std.size();
+      for (unsigned int i = 0; i < means.size() ; i++) {
+        statFile << " " << means.at(i) ;
+      }
+      for (unsigned int i = 0; i < std.size(); i++) {
+        statFile << " " << std.at(i);
+      }
+    }
+
     float priors[] = {0.85,0.15};  // weights of each classification for classes
-    // (all equal as equal samples of each digit)
+
     for (int i = 0; i < numberOfIterations; i++) {
-      //std::cout << i << std::endl;
+
+      correctClass = 0;
+      wrongClass = 0;
+      for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
+        falsePositives[i] = 0;
+      }
+
       CvRTParams params = CvRTParams(paramMin + i * step, // max depth
         20, // min sample count
         0, // regression accuracy: N/A here
         false, // compute surrogate split, no missing data
         15, // max number of categories (use sub-optimal algorithm for larger numbers)
-        priors, // the array of priors
+        0, // the array of priors
         false,  // calculate variable importance
         0,       // number of variables randomly selected at node and used to find the best split(s).
         100,	 // max number of trees in the forest
@@ -179,84 +214,65 @@ int main( int argc, char** argv ) {
 
       // train random forest classifier (using training data)
 
-      printf( "\nUsing training database: %s\n\n", argv[1]);
+      std::cout << "Training iteration for the classifier : " << i+1 << std::endl;
+
       CvRTrees* rtree = new CvRTrees;
 
-      rtree->train(training_data, CV_ROW_SAMPLE, training_classifications, Mat(), Mat(), var_type, Mat(), params);
+      rtree->train(trainingData, CV_ROW_SAMPLE, trainingClassifications, Mat(), Mat(), varType, Mat(), params);
 
-      // perform classifier testing and report results
+      //We test it with the validation data
+      std::cout << "Calculating error on the validation sample." << std::endl;
 
-      Mat test_sample;
-      int correct_class = 0;
-      int wrong_class = 0;
-      int false_positives [NUMBER_OF_CLASSES] = {0,0};
-
-      printf( "\nUsing testing database: %s\n\n", argv[2]);
-
-      for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
+      for (int tsample = 0; tsample < NUMBER_OF_VALIDATION_SAMPLES; tsample++) {
         // extract a row from the testing matrix
-        test_sample = testing_data.row(tsample);
+        validationSample = validationData.row(tsample);
 
         // run random forest prediction
-        result = rtree->predict(test_sample, Mat());
+        result = rtree->predict(validationSample, Mat());
 
         // if the prediction and the (true) testing classification are the same
         // (N.B. openCV uses a floating point decision tree implementation!)
-        if (result == testing_classifications.at<float>(tsample, 0)) {
-          correct_class++;
+        if (result == validationClassifications.at<float>(tsample, 0)) {
+          correctClass++;
         } else {
-          wrong_class++;
-          false_positives[(int)result]++;
+          wrongClass++;
+          falsePositives[(int)result]++;
         }
       }
 
-      printf( "\nResults on the testing database: %s\n"
-      "\tCorrect classification: %d (%g%%)\n"
-      "\tWrong classifications: %d (%g%%)\n",
-      argv[2],
-      correct_class, (double) correct_class*100/NUMBER_OF_TESTING_SAMPLES,
-      wrong_class, (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES);
+      std::cout << "Result on validation set :\n\tCorrect classification: " << correctClass << ", " << (double)correctClass*100/NUMBER_OF_VALIDATION_SAMPLES << "%\n\tWrong classifications: " << wrongClass << " " << (double) wrongClass*100/NUMBER_OF_VALIDATION_SAMPLES << "%" << std::endl;
 
       for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-        printf( "\tClass (digit %d) false postives 	%d (%g%%)\n", i,
-        false_positives[i],
-        (double) false_positives[i]*100/NUMBER_OF_TESTING_SAMPLES);
+        std::cout << "\tClass (digit " << i << ") false postives : " << (double)falsePositives[i]*100/NUMBER_OF_VALIDATION_SAMPLES << std::endl;
       }
 
       if (errorMin == 0) {
-        errorMin = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
+        errorMin = (double) wrongClass*100/NUMBER_OF_VALIDATION_SAMPLES;
         currentError = errorMin;
       } else {
-        currentError = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
+        currentError = (double) wrongClass*100/NUMBER_OF_VALIDATION_SAMPLES;
       }
 
-      std::cout << errorMin << std::endl;
-      std::cout << currentError << std::endl;
-      //write to file for display
-      myfile << paramMin + i * step;
-      myfile << ",";
-      myfile << currentError;
-      myfile << ";\n";
+      if (argc == 4) {
+        //write to file for display
+        csvFile << paramMin + i * step;
+        csvFile << ",";
+        csvFile << currentError;
+        csvFile << ";\n";
 
-      // all matrix memory freed by destructors
-      if (argc == 4 && currentError <= errorMin) {
-        string file = "models/";
-        file.append(argv[3]);
-        file.append(".xml");
-        std::cout << file << std::endl;
-        rtree->save(file.c_str());
-        errorMin = currentError;
-        optimumParam = paramMin + i * step;
+        if (currentError <= errorMin) {
+          rtree->save(file.c_str());
+          errorMin = currentError;
+          optimumParam = paramMin + i * step;
+        }
       }
-      std::cout << optimumParam << std::endl;
-      // all OK : main returns 0
+      std::cout << "Optimum parameter so far :" << optimumParam << std::endl;
 
     }
-
-
-    myfile.close();
-
-
+    if (argc == 4) {
+      csvFile.close();
+      statFile.close();
+    }
     return 0;
   }
 
