@@ -1,20 +1,22 @@
-\chapter{First approach}
+\section{First approach}
 
-\section{Data separation}
+This is the First try with the different techniques, here not optimization will be carried out. Each parameter used will be selected either randomly or following the standards in use for the technique.
 
-Since no opotimization will be carried at this stage there is no use in splitting again the bigger subset for the training of the different models.
+The whole training was used for training the data, there was no further separation than the one in detailled in the introduction :
+\begin{itemize}
+  \item training set of 2006 elements;
+  \item testing set of 353 elements.
+\end{itemize}
 
-\section{SVM}
+\subsection{SVM}
 
-Since we don't want to get the svm to be one step ahead of the other methods we will not use the auto train method of the svm class. We will select the parameter value as "in between value" to see what we can get, but since they are selected at my appreciation, the result might be very poor for this part.
-For the svm only the Support Vector Classification will be used, but each kernel will be tested.
+Since here we do not want to get the svm to be one step ahead of the other methods we will not use the auto train method of the svm class. We will select the parameter value as "in between value" to see what we can get, but since they are selected at my appreciation, the result might be very poor for this part.
+For the svm only the Support Vector Classification will be used, but each kernel will be tested (cf opencv documentation).
 
 
-\subsection{linear}
+\subsubsection{Linear}
 
-The first type of model used was the linear one. The parameter C was set to 1;
-
-Results :
+The first type of model used was the linear one. The parameter C was set to 1. The results were the following :
 \begin{itemize}
   \item Correct classification : 81.87\%;
   \item Wrong classification : 18.13\%;
@@ -22,12 +24,19 @@ Results :
   \item False positive ad : 2.83\%.
 \end{itemize}
 
-We can see that we get not so bad results with 81\% of good classification. Also we can notice that this classifier is best to find the non-ad since it only has 2.8\% of miss classification against 15\%.
+We can see that we get not so bad results with 81\% of good classification. Also we can notice that this classifier is good to find the ad without error since it only has 2.8\% of miss classification against 15\%. This is probably the kind of behaviour we would expect from a classifier in that case. No false positive on the ad and a higher number for the false positive on the non-ad to avoid masking content intended for the user.
 
-\subsection{Polynomial}
-The parameter degree was set to 15, gamma to 1 and coeff0 to 1.
+\subsubsection{Polynomial}
 
-Results :
+Then the polynamial kernel was tested. Among the parameters to set, the following choices were made :
+\begin{itemize}
+  \item degree to 15;
+  \item gamma to 1;
+  \item coeff0 to 1;
+\end{itemize}
+
+The results were the following :
+
 \begin{itemize}
   \item Correct classification : 34.56\%;
   \item Wrong classification : 65.44\%;
@@ -35,9 +44,9 @@ Results :
   \item False positive ad : 52.12\%.
 \end{itemize}
 
-This classifier seems to be worse than the previous, only 34.6\% of correctly cassified sample, but on the other hand it has less false positives on the ad class (which might not be what one would want).
+As it is this classifier is clearly not good as we have a higher percentage of wrong classification rather than the good ones.
 
-\subsection{Radial Basis Function}
+\subsubsection{Radial Basis Function}
 
 For this classifier, gamma was set to 1.
 Results :
@@ -48,12 +57,19 @@ Results :
   \item False positive ad : 0.57\%.
 \end{itemize}
 
-This is the best classifier so far, with almost no false positive on the non ad. Still this may not be the classifier a website would want because it confuses non-ad for ad.
+This is the best classifier so far, with almost no false positive on the ad.
 
 
-\subsection{Sigmoid}
-gamma set to 1, coef0 set to 1 and c set to 1.
-Results :
+\subsubsection{Sigmoid}
+
+The last kernel for the svm is the sigmoid, the parameters were set as follow :
+\begin{itemize}
+  \item gamma to 1;
+  \item coef0 to 1;
+  \item c to 1;
+\end{itemize}
+
+It gives the following results :
 \begin{itemize}
   \item Correct classification : 16.15\%;
   \item Wrong classification : 83.85\%;
@@ -61,16 +77,17 @@ Results :
   \item False positive ad : 83.85\%.
 \end{itemize}
 
-This is probably the worst classifier so far if we look at the number, yet if you want to be sure not mistake a non-ad for an ad this is the one to pick among the smv classifier.
+This is probably the worst classifier so far. The given pourcentage mean the it classify all the data ad no matter the input.
 
-\section{Neural Network}
+\subsection{Neural Network}
+
 For the neural network, the layers used are as follow :
   \begin{itemize}
     \item input layer, 1558, the number of point in the vector inputs;
-    \item output layer, 2 outputs the number of class;
+    \item output layer, 2 outputs, the number of class;
     \item hidden layer, 20 neurons;
   \end{itemize}
-  There will be no optimization on the number of cells used within the hidden layer was selected to be between the number of input and output and not too big.
+  There will be no optimization on the number of cells used within the hidden layer was selected to be between the number of input and output and not too big. (There seem to be more of a consensus rather than a real rule for the number of nodes).
 
   Results :
   \begin{itemize}
@@ -81,7 +98,8 @@ For the neural network, the layers used are as follow :
   \end{itemize}
 
 
-\section{Random forest}
+\subsection{Random forest}
+
 The parameters used for the random forest are the following :
   \begin{itemize}
       \item depth of the tree : 100,
@@ -97,3 +115,5 @@ Results :
   \item False positive non ad : 8.50\%;
   \item False positive ad : 0.57\%.
 \end{itemize}
+
+As we can see we get also good results when it comes to identify the ad without any mistakes.

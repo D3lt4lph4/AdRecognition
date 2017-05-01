@@ -1,61 +1,65 @@
-\chapter{Cross Validation}
+\section{Cross Validation}
 
 Finally we will use the crossValidation technique in order to improve our results. The principle of this technique is to cut down the training set into a bunch of smaller set in order to find the best working model over all the sets. We switch through the new ly creqted set to train and validate the model and finally we select the model with the smaller error. The following results will show the results on this method on the test set that was keep intact at the beggining in order to havve reliable results across all the outcome of the differents models.
 
-\section{SVM}
+\subsection{SVM}
 
 For the SVM we will use the auto train function given in the Opencv library. As for the stopping point of the algorithm i will use both the max iteration and the epsilon accuracy. But one should keep in mind that this could mean awful result depending on the input since the algorithm tries to approach a maximum and might not reach it as fast as wanted depanding on the start point.
 
-\subsection{linear}
+\subsubsection{linear}
 
 The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations or 1 for epsilon.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.085\%;
-  \item Wrong classification : 9.91501\%;
-  \item False positive non ad : 5.09915\%;
-  \item False positive ad : 4.81586\%.
+  \item Correct classification : 91.78\%;
+  \item Wrong classification : 8.22\%;
+  \item False positive non ad : 7.08\%;
+  \item False positive ad : 1.13\%.
 \end{itemize}
 
+Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
+	 C 0.100000, nu 0.000000, p 0.000000
+ Training ...... Done
+Number of support vectors for trained SVM = 1
 
-\subsection{Polynomial}
+\subsubsection{Polynomial}
 
 For this one, the number of itertion was reduced to 10000 because it was taking too much time.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 87.5354\%;
-  \item Wrong classification : 12.4646\%;
+  \item Correct classification : 90.65\%;
+  \item Wrong classification : 9.35\%;
   \item False positive non ad : 8.2153\%;
   \item False positive ad : 4.24929\%.
 \end{itemize}
 
-\subsection{Radial Basis Function}
+\subsubsection{Radial Basis Function}
 
 Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 93.2011\%;
-  \item Wrong classification : 6.79887\%;
-  \item False positive non ad : 0.566572\%;
-  \item False positive ad : 6.23229\%.
+  \item Correct classification : 91.22\%;
+  \item Wrong classification : 8.78\%;
+  \item False positive non ad : 7.93\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
 
-\subsection{Sigmoid}
+\subsubsection{Sigmoid}
 
 Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 88,9518\%;
-  \item Wrong classification : 11,0482\%;
-  \item False positive non ad : 4.53258\%;
-  \item False positive ad : 6.51558\%.
+  \item Correct classification : 83.85\%;
+  \item Wrong classification : 16.15\%;
+  \item False positive non ad : 16.15\%;
+  \item False positive ad : 0\%.
 \end{itemize}
 
-\section{Neural Network}
+\subsection{Neural Network}
 For the neural network, the layers used are as follow :
   \begin{itemize}
     \item input layer, 1558, the number of point in the vector inputs;
@@ -66,10 +70,10 @@ For the neural network, the layers used are as follow :
 
   Results :
   \begin{itemize}
-    \item Correct classification : 90.6516\%;
-    \item Wrong classification : 9.34844\%;
-    \item False positive non ad : 4.53258\%;
-    \item False positive ad : 4.81586\%.
+    \item Correct classification : 92.07\%;
+    \item Wrong classification : 7.93\%;
+    \item False positive non ad : 4.82\%;
+    \item False positive ad : 3.12\%.
   \end{itemize}
 
   Now, the previous resluts were obtained without randomizing the input samples. If we randomize then we get the following results :
@@ -81,7 +85,7 @@ For the neural network, the layers used are as follow :
   \end{itemize}
 
   This results is logical because of the way the neural network is trained. Each in put is presented one after another and gradient is used to set the weight. Thus by showing one class after an other we risk to false the output by
-\section{Random forest}
+\subsection{Random forest}
 The parameters used for the random forest are the following :
   \begin{itemize}
     \item number of variable randomly selected sqrt(n) (usually the best number);

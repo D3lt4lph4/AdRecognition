@@ -1,14 +1,15 @@
-\chapter{Parameter optimization}
+\section{Parameter optimization}
 
 We've seen that the results after the simple approach (random choice of the parameter [either usual value or complete random]) can give good result but can also give under expectation ones depending on the method used.
 
-Thus we now try to optimize each parameter used for each methods in order to find the best value to use each time. On this section, the svm will be calculated using the function auto-train and a kfold segmentation of two (one is not accepted) to keep the sample intact and not gives them any advantages.
+Thus we now try to optimize each parameter used for each methods in order to find the best value to use each time. The data will still kept as it was in the begining.
 
-\section{SVM}
+\subsection{SVM}
 
+On this subsection, the svm will be calculated using the function auto-train and a kfold segmentation of two (one is not accepted) to keep the sample intact and not gives them any advantages.
 For the SVM we will use the auto train function given in the Opencv library. As for the stopping point of the algorithm i will use both the max iteration and the epsilon accuracy. But one should keep in mind that this could mean awful result depending on the input since the algorithm tries to approach a maximum and might not reach it as fast as wanted depanding on the start point.
 
-\subsection{linear}
+\subsubsection{linear}
 
 The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 1 for epsilon.
 
@@ -19,15 +20,12 @@ Results :
   \item False positive non ad : 4.82\%;
   \item False positive ad : 5.10\%.
 \end{itemize}
-Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
-	 C 0.500000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 1
-100000
 
-\subsection{Polynomial}
+The final selected parameter is the following : 0.5 for C. As we can see there is improvement within the results, we go from 81.87\% of correct classification to 90.08\%.
 
-For this one, the number of itertion was keep at 10000 because it was taking too much time.
+\subsubsection{Polynomial}
+
+For this one, the number of itertion was lowered down to 10000 because the time required for the optimization was too long.
 
 Results :
 \begin{itemize}
@@ -36,14 +34,18 @@ Results :
   \item False positive non ad : 5.67\%;
   \item False positive ad : 0.85\%.
 \end{itemize}
-Using optimal parameters degree 3.430000, gamma 0.000010, ceof0 0.100000
-	 C 0.500000, nu 0.000000, p 0.000000
-   Number of support vectors for trained SVM = 432
 
+The optimal parameter selected were :
+\begin{itemize}
+  \item degree 3.430000;
+  \item gamma 0.000010;
+  \item ceof0 0.100000;
+  \item number of supoport vectors 432.
+\end{itemize}
 
-\subsection{Radial Basis Function}
+\subsubsection{Radial Basis Function}
 
-We keep 1000 iterations.
+We keep 10000 iterations.
 
 Results :
 \begin{itemize}
@@ -53,12 +55,15 @@ Results :
   \item False positive ad : 0.57\%.
 \end{itemize}
 
-Using optimal parameters degree 0.000000, gamma 0.033750, ceof0 0.000000
-	 C 12.500000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 877
+The optimal parameters selected were :
+\begin{itemize}
+  \item gamma 0.033750;
+  \item C 12.500000;
+  \item number of supoport vectors 877.
+\end{itemize}
 
-\subsection{Sigmoid}
+
+\subsubsection{Sigmoid}
 
 Still a 1000 iterations
 
@@ -69,13 +74,22 @@ Results :
   \item False positive non ad : 6.79887\%;
   \item False positive ad : 6.79887\%.
 \end{itemize}
+
+The optimal parameters selected were :
+\begin{itemize}
+  \item ceof0 0.100000;
+  \item gamma 0.000150;
+  \item C 0.500000;
+  \item number of support vectors 313.
+\end{itemize}
 Using optimal parameters degree 0.000000, gamma 0.000150, ceof0 0.100000
 	 C 0.500000, nu 0.000000, p 0.000000
  Training ...... Done
 Number of support vectors for trained SVM = 313
 
 
-\section{Neural Network}
+\subsection{Neural Network}
+
 For the neural network, the layers used are as follow :
   \begin{itemize}
     \item input layer, 1558, the number of point in the vector inputs;
@@ -93,14 +107,14 @@ For the neural network, the layers used are as follow :
     \item False positive ad : 3.34\%.
   \end{itemize}
 
-40
+
   \begin{figure}[h]
    \centering
    \includegraphics[scale=0.5]{../images/NNPO.png}
    \caption{Class diagram}
   \end{figure}
 
-\section{Random forest}
+\subsection{Random forest}
 For the random forrest i only played with the following parameter as it's the same with more, only giving more calculations :
   \begin{itemize}
     \item number of variable randomly selected sqrt(n) (usually the best number);

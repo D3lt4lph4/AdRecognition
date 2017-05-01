@@ -160,14 +160,15 @@ int main( int argc, char** argv ) {
       //Select the current fold for validation and the rest for training
       selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
 
+      std::cout << numberOfIterations << std::endl;
       //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
 
         //Setting to 0 error variables
         correctClass = 0;
         wrongClass = 0;
-        for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-          falsePositives[i] = 0;
+        for (int j = 0; j < NUMBER_OF_CLASSES; j++) {
+          falsePositives[j] = 0;
         }
 
         //Setting the layers, the number of neuron will ba what we try to optimize
@@ -185,7 +186,7 @@ int main( int argc, char** argv ) {
         CvANN_MLP_TrainParams params = CvANN_MLP_TrainParams( cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001), CvANN_MLP_TrainParams::BACKPROP, 0.1, 0.1);
 
         // train the neural network (using training data)
-        std::cout << "Training iteration for the classifier : " << i+1 << std::endl;
+        std::cout << "Training iteration for the classifier : " << i + 1 << std::endl;
 
         int iterations = nnetwork->train(trainingData, trainingClassifications, Mat(), Mat(), params);
 
@@ -237,7 +238,7 @@ int main( int argc, char** argv ) {
         bestParam = paramMin + i * step;
       }
 
-      if (argc == 4) {
+      if (argc == 3) {
         csvFile << paramMin + i * step;
         csvFile << ",";
         csvFile << meanError[0];
@@ -269,7 +270,7 @@ int main( int argc, char** argv ) {
 
       std::cout << "Training the model with the best parameter on the whole dataset." << std::endl;
 
-      nnetwork->train(trainingData, trainingClassifications, Mat(), Mat(), params);
+      nnetwork->train(data, dataClassification, Mat(), Mat(), params);
 
       nnetwork->save(file.c_str());
 

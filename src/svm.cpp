@@ -116,7 +116,7 @@ int main( int argc, char** argv ) {
 
   //Creating matrix for validation
   Mat validationSample;
-  int correctClass = 0, wrongClass = 0, falsePositives[NUMBER_OF_CLASSES] = {0,0}, kFold = 2;
+  int correctClass = 0, wrongClass = 0, falsePositives[NUMBER_OF_CLASSES] = {0,0}, kFold = 5;
   float result;
   //Vector for mean and std values
   std::vector<float> means, std;

@@ -1,23 +1,26 @@
-\chapter{Priors}
+\section{Priors and normalization}
 
-In this section we will add the prior in the parameter when it is possible to see how it can improve the result on the trained methods.
+In this section we will add the priors in the parameter and normalize the data to see how it can improve the result on the trained methods.
 
-\section{SVM}
+The priors are for opencv argement given to the training model to specify the classes repartition within the data, here 84\% of non ad and 16\% of ads.
 
-Since we don't want to get the svm to be one step ahead of the other methods we will not use the auto train method of the svm class. We will select the parameter value as "in between value" to see what we can get, but since they are selected at my appreciation, the result might be very poor for this part.
-For the svm only the Support Vector Classification will be used, but each kernel will be tested.
+Normalizing the data can improve results depending on the method used. For instance for the svm it helps improving the results by "giving the same improtance to each point in the data vector". Meaning no value will be overpowerful over the others (range from -30 to 30 aginst range from -1 to 1).
+
+\subsection{SVM}
+
+Here we still use the autotrain method but only with
 
 
-\subsection{linear}
+\subsubsection{linear}
 
 The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations or 1 for epsilon.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.7847\%;
-  \item Wrong classification : 8.2153\%;
-  \item False positive non ad : 7.08215\%;
-  \item False positive ad : 1.13314\%.
+  \item Correct classification : 91.78\%;
+  \item Wrong classification : 8.22\%;
+  \item False positive non ad : 7.08\%;
+  \item False positive ad : 1.13\%.
 \end{itemize}
 
 Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
@@ -26,24 +29,23 @@ Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
  Training ...... Done
 Number of support vectors for trained SVM = 1
 
-\subsection{Polynomial}
+\subsubsection{Polynomial}
 
 For this one, the number of itertion was reduced to 1000 because it was taking too much time.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.3683\%;
-  \item Wrong classification : 9.63173\%;
-  \item False positive non ad : 8.2153\%;
-  \item False positive ad : 1.41643\%.
+  \item Correct classification : 90.37\%;
+  \item Wrong classification : 9.63\%;
+  \item False positive non ad : 8.22\%;
+  \item False positive ad : 1.42\%.
 \end{itemize}
-Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
 Using optimal parameters degree 0.490000, gamma 0.506250, ceof0 274.400000
 	 C 2.500000, nu 0.000000, p 0.000000
  Training ...... Done
-Number of support vectors for trained SVM = 190
+Number of support vectors for trained SVM = 189
 
-\subsection{Radial Basis Function}
+\subsubsection{Radial Basis Function}
 
 Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
@@ -51,25 +53,24 @@ Results :
 \begin{itemize}
   \item Correct classification : 91.2181\%;
   \item Wrong classification : 8.78187\%;
-  \item False positive non ad : 7.93201\%;
-  \item False positive ad : 0.849858\%.
+  \item False positive non ad : 7.93\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
-Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
 Using optimal parameters degree 0.000000, gamma 0.000150, ceof0 0.000000
 	 C 62.500000, nu 0.000000, p 0.000000
  Training ...... Done
-Number of support vectors for trained SVM = 388
+Number of support vectors for trained SVM = 416
 
 
-\subsection{Sigmoid}
+\subsubsection{Sigmoid}
 
 Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 83.8527\%;
-  \item Wrong classification : 16.1473\%;
-  \item False positive non ad : 16.1473\%;
+  \item Correct classification : 83.85\%;
+  \item Wrong classification : 16.15\%;
+  \item False positive non ad : 16.15\%;
   \item False positive ad : 0\%.
 \end{itemize}
 Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
@@ -78,7 +79,7 @@ Using optimal parameters degree 0.000000, gamma 0.000010, ceof0 0.100000
  Training ...... Done
 Number of support vectors for trained SVM = 382
 
-\section{Neural Network}
+\subsection{Neural Network}
 For the neural network, the layers used are as follow :
   \begin{itemize}
     \item input layer, 1558, the number of point in the vector inputs;
@@ -99,20 +100,20 @@ For the neural network, the layers used are as follow :
   models/NNPriRan.xml
   80
 
-\section{Random forest}
+\subsection{Random forest}
 The parameters used for the random forest are the following :
   \begin{itemize}
     \item number of variable randomly selected sqrt(n) (usually the best number);
   \end{itemize}
 Results :
 \begin{itemize}
-  \item Correct classification : 94.9008\%;
-  \item Wrong classification : 5.09915\%;
-  \item False positive non ad : 3.39943\%;
-  \item False positive ad : 1.69972\%.
+  \item Correct classification : 93.2\%;
+  \item Wrong classification : 6.80\%;
+  \item False positive non ad : 5.95\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
 
-Results on the testing database: data/ad_cranfieldSub.test
+Results on the testing database: data/ad\_cranfieldSub.test
 	Correct classification: 330 (93.4844%)
 	Wrong classifications: 23 (6.51558%)
 	Class (digit 0) false postives 	21 (5.94901%)
