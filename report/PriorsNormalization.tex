@@ -8,7 +8,7 @@ Normalizing the data can improve results depending on the method used. For insta
 
 \subsection{SVM}
 
-Here we still use the autotrain method but only with
+Here we still use the autotrain method but only with 2 folds. Again here the main goal is to test the effects of normalization and priors on the dataset, not the get the best parameter with a crossvalidation.
 
 
 \subsubsection{linear}
@@ -23,11 +23,10 @@ Results :
   \item False positive ad : 1.13\%.
 \end{itemize}
 
-Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
-Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
-	 C 0.100000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 1
+The optimal parameters selected were :
+\begin{itemize}
+  \item C 0.1;
+\end{itemize}
 
 \subsubsection{Polynomial}
 
@@ -40,10 +39,16 @@ Results :
   \item False positive non ad : 8.22\%;
   \item False positive ad : 1.42\%.
 \end{itemize}
-Using optimal parameters degree 0.490000, gamma 0.506250, ceof0 274.400000
-	 C 2.500000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 189
+
+The optimal parameters selected were :
+\begin{itemize}
+  \item degree 0.490000;
+  \item ceof0 274.400000;
+  \item gamma 0.506250;
+  \item C 2.500000;
+  \item number of support vectors 189.
+\end{itemize}
+
 
 \subsubsection{Radial Basis Function}
 
@@ -51,15 +56,19 @@ Since the result on the first model were not good enough I tried an other one, t
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.2181\%;
-  \item Wrong classification : 8.78187\%;
+  \item Correct classification : 91.22\%;
+  \item Wrong classification : 8.78\%;
   \item False positive non ad : 7.93\%;
   \item False positive ad : 0.85\%.
 \end{itemize}
-Using optimal parameters degree 0.000000, gamma 0.000150, ceof0 0.000000
-	 C 62.500000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 416
+
+The optimal parameters selected were :
+\begin{itemize}
+  \item ceof0 0.100000;
+  \item gamma 0.000150;
+  \item C 62.500000;
+  \item number of support vectors 416.
+\end{itemize}
 
 
 \subsubsection{Sigmoid}
@@ -73,11 +82,14 @@ Results :
   \item False positive non ad : 16.15\%;
   \item False positive ad : 0\%.
 \end{itemize}
-Training the SVM (in progress) ..... (SVM 'grid search' => may take some time!)
-Using optimal parameters degree 0.000000, gamma 0.000010, ceof0 0.100000
-	 C 0.100000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 382
+
+The optimal parameters selected were :
+\begin{itemize}
+  \item ceof0 0.100000;
+  \item gamma 0.000010;
+  \item C 0.100000;
+  \item number of support vectors 382.
+\end{itemize}
 
 \subsection{Neural Network}
 For the neural network, the layers used are as follow :
@@ -86,7 +98,8 @@ For the neural network, the layers used are as follow :
     \item output layer, 2 outputs the number of class;
     \item hidden layer;
   \end{itemize}
-  There will be no optimization on the number of cells used within the hidden layer and the number selected is of 40.
+
+The final number of cells within the hidden layer was of 90;
 
   Results :
   \begin{itemize}
@@ -95,10 +108,7 @@ For the neural network, the layers used are as follow :
     \item False positive non ad : 4.25\%;
     \item False positive ad : 2.83\%.
   \end{itemize}
-  7.08215
-  7.08215
-  models/NNPriRan.xml
-  80
+
 
 \subsection{Random forest}
 The parameters used for the random forest are the following :
@@ -113,12 +123,4 @@ Results :
   \item False positive ad : 0.85\%.
 \end{itemize}
 
-Results on the testing database: data/ad\_cranfieldSub.test
-	Correct classification: 330 (93.4844%)
-	Wrong classifications: 23 (6.51558%)
-	Class (digit 0) false postives 	21 (5.94901%)
-	Class (digit 1) false postives 	2 (0.566572%)
-7.36544
-6.51558
-models/RFPriRan.xml
-818
+500

@@ -18,10 +18,12 @@ Results :
   \item False positive ad : 1.13\%.
 \end{itemize}
 
-Using optimal parameters degree 0.000000, gamma 1.000000, ceof0 0.000000
-	 C 0.100000, nu 0.000000, p 0.000000
- Training ...... Done
-Number of support vectors for trained SVM = 1
+The optimal parameters selected were :
+\begin{itemize}
+  \item C 0.1;
+\end{itemize}
+
+We can notice that we get the value as for the previous section.
 
 \subsubsection{Polynomial}
 
@@ -31,13 +33,12 @@ Results :
 \begin{itemize}
   \item Correct classification : 90.65\%;
   \item Wrong classification : 9.35\%;
-  \item False positive non ad : 8.2153\%;
-  \item False positive ad : 4.24929\%.
+  \item False positive non ad : 8.22\%;
+  \item False positive ad : 1.13\%.
 \end{itemize}
 
+Here the results are a bit improved, we reduced the number of false positive for the ads.
 \subsubsection{Radial Basis Function}
-
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
 Results :
 \begin{itemize}
@@ -47,9 +48,10 @@ Results :
   \item False positive ad : 0.85\%.
 \end{itemize}
 
+Results are the same.
 \subsubsection{Sigmoid}
 
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
+Regression, the classifier puts everything as a non ad.
 
 Results :
 \begin{itemize}
@@ -66,25 +68,15 @@ For the neural network, the layers used are as follow :
     \item output layer, 2 outputs the number of class;
     \item hidden layer;
   \end{itemize}
-  There will be no optimization on the number of cells used within the hidden layer and the number selected is of 40.
 
-  Results :
   \begin{itemize}
-    \item Correct classification : 92.07\%;
-    \item Wrong classification : 7.93\%;
-    \item False positive non ad : 4.82\%;
-    \item False positive ad : 3.12\%.
+    \item Correct classification : 90.65\%;
+    \item Wrong classification : 9.348\%;
+    \item False positive non ad : 4.533\%;
+    \item False positive ad : 4.816\%.
   \end{itemize}
 
-  Now, the previous resluts were obtained without randomizing the input samples. If we randomize then we get the following results :
-  \begin{itemize}
-    \item Correct classification : 91.7847\%;
-    \item Wrong classification : 8.2153\%;
-    \item False positive non ad : 2.26629\%;
-    \item False positive ad : 5.94901\%.
-  \end{itemize}
 
-  This results is logical because of the way the neural network is trained. Each in put is presented one after another and gradient is used to set the weight. Thus by showing one class after an other we risk to false the output by
 \subsection{Random forest}
 The parameters used for the random forest are the following :
   \begin{itemize}
@@ -92,8 +84,8 @@ The parameters used for the random forest are the following :
   \end{itemize}
 Results :
 \begin{itemize}
-  \item Correct classification : 94.9008\%;
-  \item Wrong classification : 5.09915\%;
-  \item False positive non ad : 3.39943\%;
-  \item False positive ad : 1.69972\%.
+  \item Correct classification : 92.07\%;
+  \item Wrong classification : 7.93\%;
+  \item False positive non ad : 7.082\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
