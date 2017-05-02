@@ -1,16 +1,21 @@
-// Example : select a subset of lines in a specified input file
-// between a specified min and max line numbers INCLUSIVE
+// Example : Create two subsets from an original one according to a specified ratio
 // (also removing any empty lines in the file - i.e. no chars apart from "\n")
 
 // usage: prog inputFile outputNameFile trainRatio
-// where inputfile is the name of the file containing all of the data;
-// outputNameFile is the name to use for train & test output file ie : <outputNameFile>.train <outputNameFile>.test
-//  trainRatio the ratio between the number of samples within the train file and the number of sample. 0.6 for 1000 total sample would mean 600 sample for training (could be a bit off if odd number of class1 &| class2)
+// where:
+//	- inputfile is the name of the file containing all of the data;
+//  - outputNameFile is the name to use for train & test output file ie : <outputNameFile>.train <outputNameFile>.test
+// 	- trainRatio the ratio between the number of samples within the train file and the number of sample. 0.6 for 1000 total sample would mean 600 sample for training (could be a bit off if odd number of class1 &| class2)
+// If no trainRatio is specified, 0.5 will be used
 
-// Author : Toby Breckon, toby.breckon@cranfield.ac.uk
+// Made for use with the provided dataset.
+
+// Author : Deguerre Benjamin
 
 // Copyright (c) 2009 School of Engineering, Cranfield University
-// License : LGPL - http://www.gnu.org/licenses/lgpl.html
+// License : GPLv3 - https://www.gnu.org/licenses/gpl-3.0.fr.html
+
+//Made using the selectlines.cpp file from Toby Breckon
 
 /******************************************************************************/
 
@@ -30,15 +35,16 @@ using namespace std;
 int main( int argc, char** argv )
 {
 
-	vector<char *> inputlinesAd, inputlinesNonAd; 				// vector of input lines
-	vector<char *>::iterator outline;		// iterator for above
+	vector<char *> inputlinesAd, inputlinesNonAd;	// vector of input lines
+	vector<char *>::iterator outline; // iterator for above
 
-  char * line = NULL;
+	char * line = NULL;
 
-  std::regex e (".*nonad\.");
+	std::regex e (".*nonad\."); // regex for differanciating between ad and non-ad
 
-	int lineN = 0, count = 0, middle = 0,trainSampleN = 0;
-	double ratio, trainRatioWanted = 0.5, dataRatio = 0;
+	//Setting counter for splitting the data
+	int lineN = 0, nSample = 0, middle = 0,trainSampleN = 0;
+	double trainRatioWanted = 0.5;
 
 	string fileName = argv[2], fTr, fTe;
 
@@ -68,69 +74,54 @@ int main( int argc, char** argv )
 		return -1; // all not OK
 	}
 
+	//Ratio wanted by the user
 	if (argc >= 4) {
 		trainRatioWanted = atof(argv[3]);
-	}
-	if (argc >= 5) {
-		dataRatio = atof(argv[4]);
 	}
 
 
 	// read in all the lines of the file (allocating fresh memory for each)
-	while (!feof(fi))
-	{
+	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
 		fscanf(fi, "%[^\n]\n", line);
 
-    if (std::regex_match (line,e)){
-      inputlinesNonAd.push_back(line);
-    } else {
-      inputlinesAd.push_back(line);
-    }
-    count++;
+		if (std::regex_match (line,e)){
+			inputlinesNonAd.push_back(line);
+		} else {
+			inputlinesAd.push_back(line);
+		}
+		nSample++;
 	}
 
-  ratio = inputlinesAd.size() / (double)count;
-	std::cout << "Current ratio for the data : " << ratio << std::endl;
-
-	std::cout << count << std::endl;
-	std::cout << inputlinesAd.size() << std::endl;
-
-
-	if (dataRatio == 0) {
-		middle = inputlinesAd.size() * trainRatioWanted;
-		for(outline = inputlinesAd.begin(); outline < inputlinesAd.end(); outline++) {
-			if (lineN <= middle) {
-				fprintf(fTrain, "%s\n", *outline);
-				trainSampleN++;
-			} else {
-				fprintf(fTest, "%s\n", *outline);
-			}
-			lineN++;
-			free((void *) *outline); // free memory also, vector screwed from that point
+	//Write ad to the correct file to respect the ratio
+	middle = inputlinesAd.size() * trainRatioWanted; //Getting the number of ad sample in the training set
+	for(outline = inputlinesAd.begin(); outline < inputlinesAd.end(); outline++) {
+		if (lineN <= middle) {
+			fprintf(fTrain, "%s\n", *outline);
+			trainSampleN++;
+		} else {
+			fprintf(fTest, "%s\n", *outline);
 		}
+		lineN++;
+		free((void *) *outline); // free memory also, vector screwed from that point
+	}
 
-		middle = inputlinesNonAd.size() * trainRatioWanted;
-		lineN = 0;
-		for(outline = inputlinesNonAd.begin(); outline < inputlinesNonAd.end(); outline++) {
-			if (lineN <= middle) {
-				trainSampleN++;
-				fprintf(fTrain, "%s\n", *outline);
-			} else {
-				fprintf(fTest, "%s\n", *outline);
-			}
-			lineN++;
-			free((void *) *outline); // free memory also, vector screwed from that point
+	//Write non-ad to the correct file
+	middle = inputlinesNonAd.size() * trainRatioWanted; //Getting the number of non-ad sample in the training set
+	lineN = 0;
+	for(outline = inputlinesNonAd.begin(); outline < inputlinesNonAd.end(); outline++) {
+		if (lineN <= middle) {
+			trainSampleN++;
+			fprintf(fTrain, "%s\n", *outline);
+		} else {
+			fprintf(fTest, "%s\n", *outline);
 		}
-
-	} else if (dataRatio <= ratio) {
-		/* code */
-	} else {
-
+		lineN++;
+		free((void *) *outline); // free memory also, vector screwed from that point
 	}
 
 	std::cout << "Number of train sample : " << trainSampleN << std::endl;
-	std::cout << "Number of test sample : " << count - trainSampleN << std::endl;
+	std::cout << "Number of test sample : " << nSample - trainSampleN << std::endl;
 
 	fclose(fi);
 	fclose(fTrain);

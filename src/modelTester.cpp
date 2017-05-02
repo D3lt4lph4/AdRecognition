@@ -1,11 +1,14 @@
-// Example : ML assignment data reader 2011
-// usage: prog training_data_file testingData_file
+// Example : program that allow the testing of the generated models
+
+// usage : prog testingDataFile model modelType
+// Where :
+//  - testingDataFile is the data to test
+//  - model is the model to use
+//  - modelType the type of model to use (1 for svm, 2 for Random Forest and 3 for Neural Network) 
 
 // For use with testing/training datasets of the same format as: ad_cranfield.data
 
-// for simple test of data reading run as "reader ad_cranfield.data ad_cranfield.data"
-// and set defintion below to 1 to print out input data
-
+// Author : Deguerre Benjamin
 
 /******************************************************************************/
 
