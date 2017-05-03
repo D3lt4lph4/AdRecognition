@@ -111,7 +111,7 @@ int main( int argc, char** argv ) {
   int falsePositives [NUMBER_OF_CLASSES] = {0,0};
 
   double result, currentError = 0, errorMin = 0;
-  // load training and testing data sets
+
   std::ofstream myfile;
   string csv = "data/csv/";
   if (argc == 4) {
@@ -205,7 +205,6 @@ int main( int argc, char** argv ) {
         errorMin = currentError;
         bestParam = paramMin + i * step;
       }
-      // std::cout << bestParam << std::endl;
     }
 
     std::cout << "The best value for the parameter is : " << bestParam << std::endl;
