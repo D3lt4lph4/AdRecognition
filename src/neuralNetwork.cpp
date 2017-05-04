@@ -245,7 +245,6 @@ int main( int argc, char** argv ) {
       }
 
       if (argc == 4 && currentError <= errorMin) {
-        string file = "data/models/";
         file.append(argv[3]);
         file.append(".xml");
         nnetwork->save(file.c_str());
