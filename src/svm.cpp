@@ -15,6 +15,7 @@
 
 #include <cv.h>       // opencv general include file
 #include <ml.h>		  // opencv machine learning include file
+#include <fstream>
 
 using namespace cv; // OpenCV API is in the C++ "cv" namespace
 
@@ -77,6 +78,36 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
   return 1; // all OK
 }
 
+// Calculate the mean value for the column of a matrix
+std::vector<float> getMeans(Mat data) {
+  std::vector<float> means;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + data.at<float>(r,c);
+    }
+    means.push_back(sum / data.rows);
+    sum = 0;
+  }
+  return means;
+}
+
+// Calculate the std for the column of a matrix
+std::vector<float> getSTD(Mat data, std::vector<float> means) {
+  std::vector<float> std;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
+    }
+    std.push_back(sqrt(sum / data.rows));
+    sum = 0;
+  }
+  return std;
+}
+
 /******************************************************************************/
 
 int main( int argc, char** argv ) {
@@ -96,19 +127,55 @@ int main( int argc, char** argv ) {
   int falsePositives [NUMBER_OF_CLASSES] = {0,0};
   float result;
 
+  // Vector for mean and std values
+  std::vector<float> means, std;
+
+  // Path for data to be saved
+  string file = "data/models/", statsName = "data/stats/";
+
+  // File
+  std::ofstream statFile;
+
+
+  Mat priors = Mat(1,2, CV_32FC1);
+  priors.at<float>(0,0) = 100;
+  priors.at<float>(0,1) = 1;
+  CvMat* pri = new CvMat(priors);
+
   if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], validationData, validationClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
+
+    means = getMeans(trainingData);
+    std = getSTD(trainingData, means);
+
+    //normalizing the training data
+    for (int c = 0; c < trainingData.cols ; c++) {
+      for (int r = 0; r < trainingData.rows ; r++) {
+        if (std.at(c) != 0) {
+          trainingData.at<float>(r,c) = (trainingData.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
+
+    //normalizing the testing data
+    for (int c = 0; c < validationData.cols ; c++) {
+      for (int r = 0; r < validationData.rows ; r++) {
+        if (std.at(c) != 0) {
+          validationData.at<float>(r,c) = (validationData.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
 
     CvSVMParams params = CvSVMParams(
     CvSVM::C_SVC,   // Type of SVM, here N classes (see manual)
-    CvSVM::SIGMOID,  // kernel type (see manual)
+    CvSVM::LINEAR,  // kernel type (see manual)
     1.0,			// kernel parameter (degree) for poly kernel only
     1.0,			// kernel parameter (gamma) for poly/rbf kernel only
     0.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
     1,				// SVM optimization parameter C
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
-    NULL,		  	// class wieghts (or priors)
-    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 0.001));
+    pri,		  	// class wieghts (or priors)
+    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000000, 0.00001));
 
     // train SVM classifier (using training data)
     CvSVM* svm = new CvSVM;
@@ -148,11 +215,22 @@ int main( int argc, char** argv ) {
     }
 
     if (argc == 4) {
-      string file = "data/models/";
       file.append(argv[3]);
       file.append(".xml");
-      std::cout << file << std::endl;
       svm->save(file.c_str());
+
+      statsName.append(argv[3]);
+      statsName.append(".stats");
+
+      statFile.open(statsName, std::ofstream::out | std::ofstream::trunc);
+      statFile << means.size() << " " << std.size();
+      for (unsigned int i = 0; i < means.size() ; i++) {
+        statFile << " " << means.at(i) ;
+      }
+      for (unsigned int i = 0; i < std.size(); i++) {
+        statFile << " " << std.at(i);
+      }
+      statFile.close();
     }
 
     return 0;

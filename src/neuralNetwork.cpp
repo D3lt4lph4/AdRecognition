@@ -78,6 +78,37 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
   return 1; // all OK
 }
 
+// Calculate the mean value for the column of a matrix
+std::vector<float> getMeans(Mat data) {
+  std::vector<float> means;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + data.at<float>(r,c);
+    }
+    means.push_back(sum / data.rows);
+    sum = 0;
+  }
+  return means;
+}
+
+// Calculate the std for the column of a matrix
+std::vector<float> getSTD(Mat data, std::vector<float> means) {
+  std::vector<float> std;
+  float sum = 0;
+
+  for (int c = 0; c < data.cols; c++) {
+    for (int r = 0; r < data.rows; r++) {
+      sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
+    }
+    std.push_back(sqrt(sum / data.rows));
+    sum = 0;
+  }
+  return std;
+}
+
+
 int main( int argc, char** argv ) {
 
   // define training data storage matrices (one for attribute examples, one
@@ -87,8 +118,8 @@ int main( int argc, char** argv ) {
 
   //define testing data storage matrices
 
-  Mat testingData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat testingClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, 2, CV_32FC1);
+  Mat validationData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat validationClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, 2, CV_32FC1);
 
   int numberOfIterations = 10, paramMin = 10, step = 10,bestParam = 0;
 
@@ -102,16 +133,43 @@ int main( int argc, char** argv ) {
   Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
   Point max_loc = Point(0,0);
 
-  std::ofstream myfile;
-  string csv = "data/csv/";
+  // Vector for mean and std values
+  std::vector<float> means, std;
+
+  std::ofstream myfile, statFile;
+  string csv = "data/csv/", file = "data/models/", statsName = "data/stats/";
   if (argc == 4) {
     csv.append(argv[3]);
     csv.append(".csv");
     myfile.open(csv);
+
+    statsName.append(argv[3]);
+    statsName.append(".stats");
+    statFile.open(statsName, std::ofstream::out | std::ofstream::trunc);
   }
 
-  if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testingData, testingClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
-    myfile.open(csv);
+  if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], validationData, validationClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
+
+    means = getMeans(trainingData);
+    std = getSTD(trainingData, means);
+
+    //normalizing the training data
+    for (int c = 0; c < trainingData.cols ; c++) {
+      for (int r = 0; r < trainingData.rows ; r++) {
+        if (std.at(c) != 0) {
+          trainingData.at<float>(r,c) = (trainingData.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
+
+    //normalizing the testing data
+    for (int c = 0; c < validationData.cols ; c++) {
+      for (int r = 0; r < validationData.rows ; r++) {
+        if (std.at(c) != 0) {
+          validationData.at<float>(r,c) = (validationData.at<float>(r,c) - means.at(c)) / std.at(c);
+        }
+      }
+    }
 
     for (int i = 0; i < numberOfIterations; i++) {
 
@@ -147,14 +205,14 @@ int main( int argc, char** argv ) {
       for (int tsample = 0; tsample < NUMBER_OF_VALIDATION_SAMPLES; tsample++) {
 
         // extract a row from the testing matrix
-        testSample = testingData.row(tsample);
+        testSample = validationData.row(tsample);
 
         // run neural network prediction
         nnetwork->predict(testSample, classificationResult);
 
         minMaxLoc(classificationResult, 0, 0, 0, &max_loc);
 
-        if (testingClassifications.at<float>(tsample, max_loc.x) == 1) {
+        if (validationClassifications.at<float>(tsample, max_loc.x) == 1) {
           correctClass++;
 
         } else {
@@ -199,6 +257,14 @@ int main( int argc, char** argv ) {
     std::cout << "The error for this parameter is : " << errorMin << std::endl;
 
     if (argc == 4) {
+      statFile << means.size() << " " << std.size();
+      for (unsigned int i = 0; i < means.size() ; i++) {
+        statFile << " " << means.at(i) ;
+      }
+      for (unsigned int i = 0; i < std.size(); i++) {
+        statFile << " " << std.at(i);
+      }
+      statFile.close();
       myfile.close();
     }
 
@@ -206,6 +272,7 @@ int main( int argc, char** argv ) {
   }
 
   if (argc == 4) {
+    statFile.close();
     myfile.close();
   }
   // not OK : main returns -1
