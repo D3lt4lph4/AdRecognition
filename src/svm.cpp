@@ -138,8 +138,8 @@ int main( int argc, char** argv ) {
 
 
   Mat priors = Mat(1,2, CV_32FC1);
-  priors.at<float>(0,0) = 100;
-  priors.at<float>(0,1) = 1;
+  priors.at<float>(0,0) = 0.84;
+  priors.at<float>(0,1) = 0.16;
   CvMat* pri = new CvMat(priors);
 
   if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], validationData, validationClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
@@ -167,7 +167,7 @@ int main( int argc, char** argv ) {
 
     CvSVMParams params = CvSVMParams(
     CvSVM::C_SVC,   // Type of SVM, here N classes (see manual)
-    CvSVM::LINEAR,  // kernel type (see manual)
+    CvSVM::SIGMOID,  // kernel type (see manual)
     1.0,			// kernel parameter (degree) for poly kernel only
     1.0,			// kernel parameter (gamma) for poly/rbf kernel only
     0.0,			// kernel parameter (coef0) for poly/sigmoid kernel only
@@ -175,7 +175,7 @@ int main( int argc, char** argv ) {
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
     pri,		  	// class wieghts (or priors)
-    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000000, 0.00001));
+    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 0.001));
 
     // train SVM classifier (using training data)
     CvSVM* svm = new CvSVM;

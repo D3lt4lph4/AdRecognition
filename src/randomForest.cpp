@@ -3,7 +3,7 @@
 // where :
 //  - trainingData the training dataset
 //  - validationData the validation dataset
-//  - outputFilesName the name used for the files output (model and xml), can be ommited
+//  - outputFilesName the name used for the files output (model, xml and stat), can be ommited
 
 // For use with testing/training datasets of the same format as: ad_cranfield.data
 
