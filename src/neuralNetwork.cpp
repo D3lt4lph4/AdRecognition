@@ -143,6 +143,9 @@ int main( int argc, char** argv ) {
     csv.append(".csv");
     myfile.open(csv);
 
+    file.append(argv[3]);
+    file.append(".xml");
+
     statsName.append(argv[3]);
     statsName.append(".stats");
     statFile.open(statsName, std::ofstream::out | std::ofstream::trunc);
@@ -245,8 +248,6 @@ int main( int argc, char** argv ) {
       }
 
       if (argc == 4 && currentError <= errorMin) {
-        file.append(argv[3]);
-        file.append(".xml");
         nnetwork->save(file.c_str());
         errorMin = currentError;
         bestParam = paramMin + i * step;
