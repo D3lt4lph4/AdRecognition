@@ -2,30 +2,29 @@
 
 In this section we will add the priors in the parameter and normalize the data to see how it can improve the result on the trained methods.
 
-The priors are for opencv argement given to the training model to specify the classes repartition within the data, here 84\% of non ad and 16\% of ads.
+The priors are, for opencv, argements given to the training model to specify the classes repartition within the data, here 84\% of non ad and 16\% of ads.
 
-Normalizing the data can improve results depending on the method used. For instance for the svm it helps improving the results by "giving the same improtance to each point in the data vector". Meaning no value will be overpowerful over the others (range from -30 to 30 aginst range from -1 to 1).
+Normalizing the data can improve results depending on the method used. For instance for the svm it can help improving the results by "giving the same improtance to each point in the data vector". Meaning no value will be overpowerful over the others (range from -30 to 30 aginst range from -1 to 1).
 
 \subsection{SVM}
 
-Here we still use the autotrain method but only with 2 folds. Again here the main goal is to test the effects of normalization and priors on the dataset, not the get the best parameter with a crossvalidation.
-
+Here we still use the autotrain method still with 2 folds. Again here the main goal is to test the effects of normalization and priors on the dataset, not the get the best parameter with a crossvalidation.
 
 \subsubsection{linear}
 
-The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations or 1 for epsilon.
+The first type of model used was the linear one. The stopping criteria was of either a 1000000 iterations or 0.001 for epsilon.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.78\%;
-  \item Wrong classification : 8.22\%;
-  \item False positive non ad : 7.08\%;
-  \item False positive ad : 1.13\%.
+  \item Correct classification : 90.37\%;
+  \item Wrong classification : 9.632\%;
+  \item False positive non ad : 8.78\%;
+  \item False positive ad : 0.85\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item C 0.1;
+  \item C : 0.1.
 \end{itemize}
 
 \subsubsection{Polynomial}
@@ -34,21 +33,19 @@ For this one, the number of itertion was reduced to 1000 because it was taking t
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.37\%;
-  \item Wrong classification : 9.63\%;
-  \item False positive non ad : 8.22\%;
-  \item False positive ad : 1.42\%.
+  \item Correct classification : 88.67\%;
+  \item Wrong classification : 11.33\%;
+  \item False positive non ad : 10.2\%;
+  \item False positive ad : 1.13\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item degree 0.490000;
-  \item ceof0 274.400000;
-  \item gamma 0.506250;
-  \item C 2.500000;
-  \item number of support vectors 189.
+  \item degree : 0.07
+  \item gamma : 0.00225;
+  \item coef0 : 1.4;
+  \item C : 321.5.
 \end{itemize}
-
 
 \subsubsection{Radial Basis Function}
 
@@ -56,20 +53,17 @@ Since the result on the first model were not good enough I tried an other one, t
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.22\%;
-  \item Wrong classification : 8.78\%;
-  \item False positive non ad : 7.93\%;
-  \item False positive ad : 0.85\%.
+  \item Correct classification : 89.52\%;
+  \item Wrong classification : 10.48\%;
+  \item False positive non ad : 9.92\%;
+  \item False positive ad : 0.57\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item ceof0 0.100000;
-  \item gamma 0.000150;
-  \item C 62.500000;
-  \item number of support vectors 416.
+  \item gamma : 0.00015;
+  \item C : 62.5.
 \end{itemize}
-
 
 \subsubsection{Sigmoid}
 
@@ -83,12 +77,11 @@ Results :
   \item False positive ad : 0\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item ceof0 0.100000;
-  \item gamma 0.000010;
-  \item C 0.100000;
-  \item number of support vectors 382.
+  \item gamma : 0.00001;
+  \item coef0 : 0.1;
+  \item C : 0.1.
 \end{itemize}
 
 \subsection{Neural Network}
@@ -103,12 +96,17 @@ The final number of cells within the hidden layer was of 90;
 
   Results :
   \begin{itemize}
-    \item Correct classification : 92.92\%;
-    \item Wrong classification : 7.08\%;
-    \item False positive non ad : 4.25\%;
-    \item False positive ad : 2.83\%.
+    \item Correct classification : 88.67\%;
+    \item Wrong classification : 11.33\%;
+    \item False positive non ad : 6.23\%;
+    \item False positive ad : 5.10\%.
   \end{itemize}
 
+  \begin{figure}[h]
+   \centering
+   \includegraphics[scale=0.5]{../images/NNPO.png}
+   \caption{Class diagram}
+  \end{figure}
 
 \subsection{Random forest}
 The parameters used for the random forest are the following :
@@ -117,10 +115,15 @@ The parameters used for the random forest are the following :
   \end{itemize}
 Results :
 \begin{itemize}
-  \item Correct classification : 93.2\%;
-  \item Wrong classification : 6.80\%;
-  \item False positive non ad : 5.95\%;
-  \item False positive ad : 0.85\%.
+  \item Correct classification : 87.25\%;
+  \item Wrong classification : 12.75\%;
+  \item False positive non ad : 12.46\%;
+  \item False positive ad : 0.2833\%.
 \end{itemize}
 
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=0.5]{../images/NNPO.png}
+ \caption{Class diagram}
+\end{figure}
 500

@@ -2,64 +2,64 @@
 
 We've seen that the results after the simple approach (random choice of the parameter [either usual value or complete random]) can give good result but can also give under expectation ones depending on the method used.
 
-Thus we now try to optimize each parameter used for each methods in order to find the best value to use each time. The data will still kept as it was in the begining.
+Thus we now try to optimize a parameter used for each methods in order to find the best value to use each time. The data used will be the training set split in two and randomised. The first new set will be the new training set and the second the validation one (for calculating the error). The following results are caluclated with the testing set.
 
 \subsection{SVM}
 
-On this subsection, the svm will be calculated using the function auto-train and a kfold segmentation of two (one is not accepted) to keep the sample intact and not gives them any advantages.
-For the SVM we will use the auto train function given in the Opencv library. As for the stopping point of the algorithm i will use both the max iteration and the epsilon accuracy. But one should keep in mind that this could mean awful result depending on the input since the algorithm tries to approach a maximum and might not reach it as fast as wanted depanding on the start point.
+On this subsection, the svms will be calculated using the function auto-train and a kfold segmentation of two (one is not accepted by the function). The dataset used is not the split one.
+For the stopping point of the algorithm the max iteration and the epsilon accuracy will be used. They will vary depending on the kernel used.
 
 \subsubsection{linear}
 
-The first type of model used was the linear one. The stopping criteria was of either a 100000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 1 for epsilon.
+The first type of model used was the linear one. The stopping criteria was of either a 1000000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 0.001 for epsilon.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.08\%;
-  \item Wrong classification : 9.92\%;
-  \item False positive non ad : 4.82\%;
-  \item False positive ad : 5.10\%.
+  \item Correct classification : 90.65\%;
+  \item Wrong classification : 9.35\%;
+  \item False positive non ad : 9.07\%;
+  \item False positive ad : 0.29\%.
 \end{itemize}
 
-The final selected parameter is the following : 0.5 for C. As we can see there is improvement within the results, we go from 81.87\% of correct classification to 90.08\%.
+The final selected parameter is the following : 0.5 for C. As we can see there is improvement within the results, we go from 81.87\% of correct classification to 90.65\%.
 
 \subsubsection{Polynomial}
 
-For this one, the number of itertion was lowered down to 10000 because the time required for the optimization was too long.
+For this one, the number of itertion was lowered down to 100000 because the time required for the optimization was too long.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 93.48\%;
-  \item Wrong classification : 6.52\%;
-  \item False positive non ad : 5.67\%;
+  \item Correct classification : 94.62\%;
+  \item Wrong classification : 5.38\%;
+  \item False positive non ad : 4.53\%;
   \item False positive ad : 0.85\%.
 \end{itemize}
 
-The optimal parameter selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item degree 3.430000;
-  \item gamma 0.000010;
-  \item ceof0 0.100000;
-  \item number of supoport vectors 432.
+  \item degree : 343;
+  \item gamma : 0.00001;
+  \item coef0 : 19.6;
+  \item C : 0.5.
 \end{itemize}
+
 
 \subsubsection{Radial Basis Function}
 
-We keep 10000 iterations.
+We kept 100000 iterations.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.22\%;
-  \item Wrong classification : 8.78\%;
-  \item False positive non ad : 8.22\%;
+  \item Correct classification : 91.78\%;
+  \item Wrong classification : 8.22\%;
+  \item False positive non ad : 7.65\%;
   \item False positive ad : 0.57\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item gamma 0.033750;
-  \item C 12.500000;
-  \item number of supoport vectors 877.
+  \item gamma : 0.00015;
+  \item C : 312.5.
 \end{itemize}
 
 
@@ -69,20 +69,18 @@ Still a 1000 iterations
 
 Results :
 \begin{itemize}
-  \item Correct classification : 86.4023\%;
-  \item Wrong classification : 13.5977\%;
-  \item False positive non ad : 6.79887\%;
-  \item False positive ad : 6.79887\%.
+  \item Correct classification : 83.85\%;
+  \item Wrong classification : 16.15\%;
+  \item False positive non ad : 16.15\%;
+  \item False positive ad : 0\%.
 \end{itemize}
 
-The optimal parameters selected were :
+The final parameters were the following ones :
 \begin{itemize}
-  \item ceof0 0.100000;
-  \item gamma 0.000150;
-  \item C 0.500000;
-  \item number of support vectors 313.
+  \item gamma : 0.00015;
+  \item coef0 : 0.1;
+  \item C : 0.5.
 \end{itemize}
-
 
 \subsection{Neural Network}
 
@@ -97,12 +95,13 @@ For the neural network, the layers used are as follow :
 
   Results :
   \begin{itemize}
-    \item Correct classification : 93.2\%;
-    \item Wrong classification : 6.80\%;
-    \item False positive non ad : 3.34\%;
-    \item False positive ad : 3.34\%.
+    \item Correct classification : 91.22\%;
+    \item Wrong classification : 8.78\%;
+    \item False positive non ad : 6.80\%;
+    \item False positive ad : 1.983\%.
   \end{itemize}
 
+  The best number of cells for the hidden layer was of 50;
 
   \begin{figure}[h]
    \centering
@@ -117,14 +116,14 @@ For the random forrest i only played with the following parameter as it's the sa
   \end{itemize}
 Results :
 \begin{itemize}
-  \item Correct classification : 95.7507\%;
-  \item Wrong classification : 4.24929\%;
-  \item False positive non ad : 2.83286\%;
-  \item False positive ad : 1.41643\%.
+  \item Correct classification : 91.22\%;
+  \item Wrong classification : 8.78\%;
+  \item False positive non ad : 8.22\%;
+  \item False positive ad : 0.57\%.
 \end{itemize}
 
 \begin{figure}[h]
  \centering
- \includegraphics[scale=0.5]{../images/RFPO.png}
+ \includegraphics[scale=0.5]{..data/images/RFPO.png}
  \caption{Class diagram}
 \end{figure}

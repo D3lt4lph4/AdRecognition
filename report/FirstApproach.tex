@@ -1,18 +1,13 @@
 \section{First approach}
 
-This is the First try with the different techniques, here not optimization will be carried out. Each parameter used will be selected either randomly or following the standards in use for the technique.
+This section describe the first approach with the different techniques, here no optimization will be carried out. Each parameter used will be selected either randomly or following the standards in use for the technique.
 
-The whole training was used for training the data, there was no further separation than the one in detailled in the introduction :
-\begin{itemize}
-  \item training set of 2006 elements;
-  \item testing set of 353 elements.
-\end{itemize}
+The whole training set was used for training the data, there was no further separation than the first one detailled in the data separation section (i.e test and training).
 
 \subsection{SVM}
 
-Since here we do not want to get the svm to be one step ahead of the other methods we will not use the auto train method of the svm class. We will select the parameter value as "in between value" to see what we can get, but since they are selected at my appreciation, the result might be very poor for this part.
 For the svm only the Support Vector Classification will be used, but each kernel will be tested (cf opencv documentation).
-
+We will select the parameter value as "in between value" to see what we can get, but since they are selected at random, the result might be very poor for this part.
 
 \subsubsection{Linear}
 
@@ -87,6 +82,7 @@ For the neural network, the layers used are as follow :
     \item output layer, 2 outputs, the number of class;
     \item hidden layer, 20 neurons;
   \end{itemize}
+  
   There will be no optimization on the number of cells used within the hidden layer was selected to be between the number of input and output and not too big. (There seem to be more of a consensus rather than a real rule for the number of nodes).
 
   Results :

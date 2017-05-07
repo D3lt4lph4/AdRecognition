@@ -2,6 +2,8 @@
 
 Finally we will use the crossValidation technique in order to improve our results. The principle of this technique is to cut down the training set into a bunch of smaller set in order to find the best working model over all the sets. We switch through the new ly creqted set to train and validate the model and finally we select the model with the smaller error. The following results will show the results on this method on the test set that was keep intact at the beggining in order to havve reliable results across all the outcome of the differents models.
 
+Since the result with the priors and normalization were not as good as the previous ones, they will not be used for this step of the assigment.
+
 \subsection{SVM}
 
 For the SVM we will use the auto train function given in the Opencv library. As for the stopping point of the algorithm i will use both the max iteration and the epsilon accuracy. But one should keep in mind that this could mean awful result depending on the input since the algorithm tries to approach a maximum and might not reach it as fast as wanted depanding on the start point.
@@ -31,10 +33,18 @@ For this one, the number of itertion was reduced to 10000 because it was taking 
 
 Results :
 \begin{itemize}
-  \item Correct classification : 90.65\%;
-  \item Wrong classification : 9.35\%;
-  \item False positive non ad : 8.22\%;
-  \item False positive ad : 1.13\%.
+  \item Correct classification : 94.33\%;
+  \item Wrong classification : 5.67\%;
+  \item False positive non ad : 0.85\%;
+  \item False positive ad : 4.82\%.
+\end{itemize}
+
+The final parameters were the following ones :
+\begin{itemize}
+  \item degree : 343
+  \item gamma : 0.00001;
+  \item coef0 : 19.6;
+  \item C : 0.1.
 \end{itemize}
 
 Here the results are a bit improved, we reduced the number of false positive for the ads.
@@ -42,10 +52,16 @@ Here the results are a bit improved, we reduced the number of false positive for
 
 Results :
 \begin{itemize}
-  \item Correct classification : 91.22\%;
-  \item Wrong classification : 8.78\%;
-  \item False positive non ad : 7.93\%;
-  \item False positive ad : 0.85\%.
+  \item Correct classification : 93.77\%;
+  \item Wrong classification : 6.232\%;
+  \item False positive non ad : 0.57\%;
+  \item False positive ad : 5.67\%.
+\end{itemize}
+
+The final parameters were the following ones :
+\begin{itemize}
+  \item gamma : 0.00015;
+  \item C : 312.5.
 \end{itemize}
 
 Results are the same.
@@ -55,10 +71,17 @@ Regression, the classifier puts everything as a non ad.
 
 Results :
 \begin{itemize}
-  \item Correct classification : 83.85\%;
-  \item Wrong classification : 16.15\%;
-  \item False positive non ad : 16.15\%;
-  \item False positive ad : 0\%.
+  \item Correct classification : 88.95\%;
+  \item Wrong classification : 11.05\%;
+  \item False positive non ad : 5.38\%;
+  \item False positive ad : 5.67\%.
+\end{itemize}
+
+The final parameters were the following ones :
+\begin{itemize}
+  \item gamma : 0.00015;
+  \item coef0 : 1.4;
+  \item C : 12.5.
 \end{itemize}
 
 \subsection{Neural Network}
@@ -76,7 +99,12 @@ For the neural network, the layers used are as follow :
     \item False positive ad : 4.816\%.
   \end{itemize}
 
-
+50
+  \begin{figure}[h]
+   \centering
+   \includegraphics[scale=0.5]{../images/NNPO.png}
+   \caption{Class diagram}
+  \end{figure}
 \subsection{Random forest}
 The parameters used for the random forest are the following :
   \begin{itemize}
@@ -89,3 +117,8 @@ Results :
   \item False positive non ad : 7.082\%;
   \item False positive ad : 0.85\%.
 \end{itemize}
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=0.5]{../images/NNPO.png}
+ \caption{Class diagram}
+\end{figure}
