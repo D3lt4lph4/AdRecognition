@@ -160,7 +160,6 @@ int main( int argc, char** argv ) {
       //Select the current fold for validation and the rest for training
       selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
 
-      std::cout << numberOfIterations << std::endl;
       //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
 

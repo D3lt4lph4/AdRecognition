@@ -1,5 +1,5 @@
 // Example : ML assignment data reader 2011
-// usage: prog trainingData_file testingData_file
+// usage: prog trainingData_file validationData_file
 
 // For use with testing/training datasets of the same format as: ad_cranfield.data
 
@@ -74,33 +74,6 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_sample
   return 1; // all OK
 }
 
-std::vector<float> getMeans(Mat data) {
-  std::vector<float> means;
-  float sum = 0;
-
-  for (int c = 0; c < data.cols; c++) {
-    for (int r = 0; r < data.rows; r++) {
-      sum = sum + data.at<float>(r,c);
-    }
-    means.push_back(sum / data.rows);
-    sum = 0;
-  }
-  return means;
-}
-
-std::vector<float> getSTD(Mat data, std::vector<float> means) {
-  std::vector<float> std;
-  float sum = 0;
-
-  for (int c = 0; c < data.cols; c++) {
-    for (int r = 0; r < data.rows; r++) {
-      sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
-    }
-    std.push_back(sqrt(sum / data.rows));
-    sum = 0;
-  }
-  return std;
-}
 /******************************************************************************/
 
 int main( int argc, char** argv ) {
@@ -111,8 +84,8 @@ int main( int argc, char** argv ) {
   Mat trainingClassifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32FC1);
 
   //define testing data storage matrices
-  Mat testingData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat testingClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, 1, CV_32FC1);
+  Mat validationData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat validationClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, 1, CV_32FC1);
 
   //Creating matrix for validation
   Mat validationSample;
@@ -128,67 +101,18 @@ int main( int argc, char** argv ) {
   std::cout.precision(4);
 
   //Creating files to write the data to, will then be used for modelTester (model only, no training)
-  std::ofstream csvFile, statFile;
-  string csvName = "data/csv/", statsName = "data/stats/", file = "data/models/";
+  std::ofstream statFile;
+  string file = "data/models/";
 
   //If model to save
   if (argc == 4) {
     //File for model
     file.append(argv[3]);
     file.append(".xml");
-
-    csvName.append(argv[3]);
-    statsName.append(argv[3]);
-    csvName.append(".csv");
-    statsName.append(".stats");
   }
 
   //Try to read data from the input file
-  if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testingData, testingClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
-
-    //We open the files to save data if requested
-    if (argc == 4) {
-      csvFile.open(csvName, std::ofstream::out | std::ofstream::trunc);
-      statFile.open(statsName, std::ofstream::out | std::ofstream::trunc);
-    }
-
-    means = getMeans(trainingData);
-    std = getSTD(trainingData, means);
-
-    //normalizing the training data
-    for (int c = 0; c < trainingData.cols ; c++) {
-      for (int r = 0; r < trainingData.rows ; r++) {
-        if (std.at(c) != 0) {
-          trainingData.at<float>(r,c) = (trainingData.at<float>(r,c) - means.at(c)) / std.at(c);
-        }
-      }
-    }
-
-    //normalizing the testing data
-    for (int c = 0; c < testingData.cols ; c++) {
-      for (int r = 0; r < testingData.rows ; r++) {
-        if (std.at(c) != 0) {
-          testingData.at<float>(r,c) = (testingData.at<float>(r,c) - means.at(c)) / std.at(c);
-        }
-      }
-    }
-
-    //Writing the stats to file
-    if (argc == 4) {
-      statFile << means.size() << " " << std.size();
-      for (unsigned int i = 0; i < means.size() ; i++) {
-        statFile << " " << means.at(i) ;
-      }
-      for (unsigned int i = 0; i < std.size(); i++) {
-        statFile << " " << std.at(i);
-      }
-    }
-
-    //Setting priors for svm
-    Mat priors = Mat(1,2, CV_32FC1);
-    priors.at<float>(0,0) = 0.85;
-    priors.at<float>(0,1) = 0.15;
-    CvMat* pri = new CvMat(priors);
+  if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], validationData, validationClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
 
     CvSVMParams params = CvSVMParams(
     CvSVM::C_SVC,   // Type of SVM, here N classes (see manual)
@@ -199,8 +123,8 @@ int main( int argc, char** argv ) {
     1,				// SVM optimization parameter C
     0,				// SVM optimization parameter nu (not used for N classe SVM)
     0,				// SVM optimization parameter p (not used for N classe SVM)
-    pri,		  	// class wieghts (or priors)
-    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 0.001));
+    NULL,		  	// class wieghts (or priors)
+    cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100000, 0.0001));
 
     // train SVM classifier (using training data)
 
@@ -216,26 +140,19 @@ int main( int argc, char** argv ) {
     svm->train_auto(trainingData, trainingClassifications, Mat(), Mat(), params, kFold);
     // svm->train(trainingData, trainingClassifications, Mat(), Mat(), params);
     params = svm->get_params();
-    printf( "\nUsing optimal parameters degree %f, gamma %f, ceof0 %f\n\t C %f, nu %f, p %f\n Training ..", params.degree, params.gamma, params.coef0, params.C, params.nu, params.p);
-    printf( ".... Done\n");
+    std::cout << "\nUsing optimal parameters degree" << params.degree << ", gamma " << params.gamma << ", ceof0 " << params.coef0 << "\n\t C " << params.C  << ", nu " << params.nu << ", p " << params.p << "\n Training ...... Done\n" << std::endl;
+    std::cout << "Number of support vectors for trained SVM = " << svm->get_support_vector_count() << std::endl;
 
-    // get the number of support vectors used to define the SVM decision boundary
-    printf("Number of support vectors for trained SVM = %i\n", svm->get_support_vector_count());
-
-    // zero the false positive counters in a simple loop
-    for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-      falsePositives[i] = 0;
-    }
 
     printf( "\nUsing testing database: %s\n\n", argv[2]);
     for (int tsample = 0; tsample < NUMBER_OF_VALIDATION_SAMPLES; tsample++) {
       // extract a row from the testing matrix
-      validationSample = testingData.row(tsample);
+      validationSample = validationData.row(tsample);
 
       // run SVM classifier
       result = svm->predict(validationSample);
 
-      if (result == testingClassifications.at<float>(tsample, 0)) {
+      if (result == validationClassifications.at<float>(tsample, 0)) {
         correctClass++;
       } else {
         wrongClass++;
@@ -245,9 +162,8 @@ int main( int argc, char** argv ) {
 
     std::cout << "Result on validation set :\n\tCorrect classification: " << correctClass << ", " << (double)correctClass*100/NUMBER_OF_VALIDATION_SAMPLES << "%\n\tWrong classifications: " << wrongClass << " " << (double) wrongClass*100/NUMBER_OF_VALIDATION_SAMPLES << "%" << std::endl;
 
-    for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-      std::cout << "\tClass (digit " << i << ") false postives : " << (double)falsePositives[i]*100/NUMBER_OF_VALIDATION_SAMPLES << std::endl;
-    }
+    std::cout << "\tClass nonad false postives : " << (double)falsePositives[1]*100/validationData.rows << std::endl;
+    std::cout << "\tClass ad false postives : " << (double)falsePositives[0]*100/validationData.rows << std::endl;
 
     if (errorMin == 0) {
       errorMin = (double) wrongClass*100/NUMBER_OF_VALIDATION_SAMPLES;
@@ -262,7 +178,6 @@ int main( int argc, char** argv ) {
         svm->save(file.c_str());
         errorMin = currentError;
       }
-      statFile.close();
     }
     return 0;
   }
