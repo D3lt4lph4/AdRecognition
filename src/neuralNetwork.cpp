@@ -111,7 +111,6 @@ int main( int argc, char** argv ) {
   }
 
   if (read_data_from_csv(argv[1], trainingData, trainingClassifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testingData, testingClassifications, NUMBER_OF_VALIDATION_SAMPLES)) {
-    myfile.open(csv);
 
     for (int i = 0; i < numberOfIterations; i++) {
 
