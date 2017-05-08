@@ -1,52 +1,34 @@
-# this file is setup to build everything for the ML examples
+#This file might need some change depending on the cmake version used
+
+PROJECT(MLAssigment)
 
 cmake_minimum_required (VERSION 2.6)
-set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS} -std=c++11" )
 
-# SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "CMakeCache.txt;CMakeFiles;cmake_install.cmake")
-
-# linux specific stuff
-
-IF ( UNIX )
-   set( CMAKE_PREFIX_PATH "/d1/benjamin/opencv/opencv-2.4.13" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
-   MESSAGE( "LINUX CONFIG" )
-ENDIF ( UNIX )
-
-# windows (inc. 64-bit specific stuff)
-
-IF ( WIN32 )
-   set( CMAKE_PREFIX_PATH "C:/OpenCV2.4/build" )
-   set( OpenCV_DIR "C:/OpenCV2.4/build" )
-   MESSAGE( "WINDOWS CONFIG" )
-ENDIF ( WIN32 )
+option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
+set( OpenCV_DIR "/d1/benjamin/opencv/opencv-2.4.13/release")
+set( CMAKE_PREFIX_PATH "/d1/benjamin/opencv/opencv-2.4.13" )
+set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -std=c++11")
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "./bin")
 
 find_package( OpenCV REQUIRED )
 
-project(./bin/svm)
-add_executable(./bin/svm ./src/svm.cpp)
-target_link_libraries(./bin/svm ${OpenCV_LIBS} )
+add_executable(svm ./src/svm.cpp)
+target_link_libraries(svm ${OpenCV_LIBS} )
 
-project(./bin/randomForest)
-add_executable(./bin/randomForest ./src/randomForest.cpp)
-target_link_libraries(./bin/randomForest ${OpenCV_LIBS} )
+add_executable(randomForest ./src/randomForest.cpp)
+target_link_libraries(randomForest ${OpenCV_LIBS} )
 
-project(./bin/neuralNetwork)
-add_executable(./bin/neuralNetwork ./src/neuralNetwork.cpp)
-target_link_libraries(./bin/neuralNetwork ${OpenCV_LIBS} )
+add_executable(neuralNetwork ./src/neuralNetwork.cpp)
+target_link_libraries(neuralNetwork ${OpenCV_LIBS} )
 
-project(./bin/randomize)
-add_executable(./bin/randomize ./src/randomize.cpp)
-target_link_libraries(./bin/randomize ${OpenCV_LIBS} )
+add_executable(randomize ./src/randomize.cpp)
+target_link_libraries(randomize ${OpenCV_LIBS} )
 
-project(./bin/selectlines)
-add_executable(./bin/selectlines ./src/selectlines.cpp)
-target_link_libraries(./bin/selectlines ${OpenCV_LIBS} )
+add_executable(selectlines ./src/selectlines.cpp)
+target_link_libraries(selectlines ${OpenCV_LIBS} )
 
-project(./bin/modelTester)
-add_executable(./bin/modelTester ./src/modelTester.cpp)
-target_link_libraries(./bin/modelTester ${OpenCV_LIBS} )
+add_executable(modelTester ./src/modelTester.cpp)
+target_link_libraries(modelTester ${OpenCV_LIBS} )
 
-project(./bin/selectRatio)
-add_executable(./bin/selectRatio ./src/selectRatio.cpp)
-target_link_libraries(./bin/selectRatio ${OpenCV_LIBS} )
+add_executable(selectRatio ./src/selectRatio.cpp)
+target_link_libraries(selectRatio ${OpenCV_LIBS} )
