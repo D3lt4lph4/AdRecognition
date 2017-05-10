@@ -2,7 +2,10 @@
 
 \paragraph{Explain how the basic data split method can be used as a simple approach to training a machine learning algorithm.\\\\}
 
-In order to train a machine learning algorithm, one needs at least two sets, one of training and one of testing. It is usally three, training, validation and testing (the last one being held by the person asking for the classifier). Those two required sets need to be different in order not to wrong the results, you would get higher results if you were testing with your training set because your classifier was optimized for this set. Thus a basic data split method can be used as a simple approach to training a machine learning algorithm by creating those two sets (one would still have to be careful about the ratio between the different classes).
+In order to train a machine learning algorithm, one needs at least two sets, one of training and one of testing. However three sets can be used (training, validation and testing) depending on the learning technique used.
+Regardless the sets need to be different in order not to wrong the results, you would get higher results if you were testing with your training set because your classifier was optimized for this set.
+
+Thus a basic data split method can be used as a simple approach to training a machine learning algorithm by creating those two sets (one would still have to be careful about the ratio between the different classes).
 
 \paragraph{List the three main types of machine learning algorithm, explaining each briefly.\\\\}
 The three main type of classifications are the following :
@@ -22,8 +25,10 @@ And as taken from the lecture, two examples within the context of ID3 decision t
   \item Bias is a preference for some hypotheses, rather than a restriction of hypothesis space H.
 \end{itemize}
 
+The first one mean that we make the assumption that most of the information is retained on a few variables. And the second one means that the bias will not exclude some trees out of hypothesis space.
+
 \paragraph{Describe the meaning of a hypothesis within the context of machine learning and what is meant by hypothesis space.\\\\}
 
-Hypothesis : the current target function approximation, i.e. the current hypothesis to what the ideal target function (rules being learnt) may be
+In machine learning we try to approximate the function which for any vector from the pair of input vector, class (x,y) will give the right class, i.e f(x) = y.
 
-Hypothesis space : the set of all possible hypotheses from which the target function is selected (i.e. learnt) through the machine learning process
+Thus, the hypothesis is the current f() approximation, the supposition of what f() should looks like. And the hypothesis space is the space containing all the possible hypothesis.

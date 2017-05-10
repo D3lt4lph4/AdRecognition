@@ -1,6 +1,6 @@
 \section{Parameter optimization}
 
-We've seen that the results after the simple approach (random choice of the parameter [either usual value or complete random]) can give good result but can also give under expectation ones depending on the method used.
+The results after the simple approach (random choice of the parameter [either usual value or complete random]) can give good result but can also give under expectation ones depending on the method used.
 
 Thus we now try to optimize a parameter used for each methods in order to find the best value to use each time. The data used will be the training set split in two and randomised. The first new set will be the new training set and the second the validation one (for calculating the error). The following results are caluclated with the testing set.
 
@@ -11,7 +11,7 @@ For the stopping point of the algorithm the max iteration and the epsilon accura
 
 \subsubsection{linear}
 
-The first type of model used was the linear one. The stopping criteria was of either a 1000000 iterations (low value to keep consistancy with the following chapter which will require more calculations) or 0.001 for epsilon.
+The first type of model used was the linear one. The stopping criteria was of either a 1000000 iterations or 0.001 for epsilon.
 
 Results :
 \begin{itemize}
@@ -43,7 +43,7 @@ The final parameters were the following ones :
   \item C : 0.5.
 \end{itemize}
 
-
+Here we can see a great improvement within the results. we get almost no error on the false positive ads.
 \subsubsection{Radial Basis Function}
 
 We kept 100000 iterations.
@@ -65,7 +65,7 @@ The final parameters were the following ones :
 
 \subsubsection{Sigmoid}
 
-Still a 1000 iterations
+Still a 100000 iterations
 
 Results :
 \begin{itemize}
@@ -82,16 +82,11 @@ The final parameters were the following ones :
   \item C : 0.5.
 \end{itemize}
 
+Here we can see no improvement in the model, the model is still putting all the prediction in one class.
+
 \subsection{Neural Network}
 
-For the neural network, the layers used are as follow :
-  \begin{itemize}
-    \item input layer, 1558, the number of point in the vector inputs;
-    \item output layer, 2 outputs the number of class;
-    \item hidden layer, this is the parameter we seek to optimize;
-  \end{itemize}
-
- For this model only the number of cell in the hidden layer will be optimized, not the number of hidden layer (doc here). And the data will be randomized before use. The result shown are with the best parameter each time.
+  Here we keep the same architecture for the neural network. For this model only the number of cell in the hidden layer will be optimized, not the number of hidden layer (doc here). And the data will be randomized before use. The result shown are with the best parameter each time.
 
   Results :
   \begin{itemize}
@@ -101,19 +96,18 @@ For the neural network, the layers used are as follow :
     \item False positive ad : 1.983\%.
   \end{itemize}
 
-  The best number of cells for the hidden layer was of 50;
+  The best number of cells for the hidden layer was of 50 as we can see on the following figure
 
   \begin{figure}[h]
    \centering
-   \includegraphics[scale=0.5]{../images/NNPO.png}
-   \caption{Class diagram}
+   \includegraphics[scale=0.5]{../data/images/NNPO.png}
+   \caption{Error depending on the number of cells in the hidden layer.}
   \end{figure}
 
 \subsection{Random forest}
-For the random forrest i only played with the following parameter as it's the same with more, only giving more calculations :
-  \begin{itemize}
-    \item number of variable randomly selected sqrt(n) (usually the best number);
-  \end{itemize}
+
+For the random forrest the only parameter optimized was the number of variable randomly selected. Here the optimization is only carried out on one of the parameter but it could be easely done on the other one. Also since it would only add calculation time this will not be done.
+
 Results :
 \begin{itemize}
   \item Correct classification : 91.22\%;
@@ -122,8 +116,10 @@ Results :
   \item False positive ad : 0.57\%.
 \end{itemize}
 
+The following figure show the error against the selected parameter to optimize.
+
 \begin{figure}[h]
  \centering
- \includegraphics[scale=0.5]{..data/images/RFPO.png}
- \caption{Class diagram}
+ \includegraphics[scale=0.5]{../data/images/RFPO.png}
+ \caption{Error depending on the number of variable randomly selected.}
 \end{figure}

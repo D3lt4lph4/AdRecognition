@@ -2,7 +2,7 @@
 
 In this section we will add the priors in the parameter and normalize the data to see how it can improve the result on the trained methods.
 
-The priors are, for opencv, argements given to the training model to specify the classes repartition within the data, here 84\% of non ad and 16\% of ads.
+The priors are, for opencv, argements given to the training model to specify the classes repartition within the data, here 84\% of non-ads and 16\% of ads.
 
 Normalizing the data can improve results depending on the method used. For instance for the svm it can help improving the results by "giving the same improtance to each point in the data vector". Meaning no value will be overpowerful over the others (range from -30 to 30 aginst range from -1 to 1).
 
@@ -29,8 +29,6 @@ The final parameters were the following ones :
 
 \subsubsection{Polynomial}
 
-For this one, the number of itertion was reduced to 1000 because it was taking too much time.
-
 Results :
 \begin{itemize}
   \item Correct classification : 88.67\%;
@@ -47,9 +45,9 @@ The final parameters were the following ones :
   \item C : 321.5.
 \end{itemize}
 
+
 \subsubsection{Radial Basis Function}
 
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
 
 Results :
 \begin{itemize}
@@ -67,8 +65,6 @@ The final parameters were the following ones :
 
 \subsubsection{Sigmoid}
 
-Since the result on the first model were not good enough I tried an other one, the polynomial one. As shown after the results were much better.
-
 Results :
 \begin{itemize}
   \item Correct classification : 83.85\%;
@@ -84,15 +80,10 @@ The final parameters were the following ones :
   \item C : 0.1.
 \end{itemize}
 
-\subsection{Neural Network}
-For the neural network, the layers used are as follow :
-  \begin{itemize}
-    \item input layer, 1558, the number of point in the vector inputs;
-    \item output layer, 2 outputs the number of class;
-    \item hidden layer;
-  \end{itemize}
+There is still no change for this model, the classification is still not working.
 
-The final number of cells within the hidden layer was of 90;
+\subsection{Neural Network}
+
 
   Results :
   \begin{itemize}
@@ -102,17 +93,16 @@ The final number of cells within the hidden layer was of 90;
     \item False positive ad : 5.10\%.
   \end{itemize}
 
+The final number of cells within the hidden layer was of 90;
+
   \begin{figure}[h]
    \centering
-   \includegraphics[scale=0.5]{../images/NNPO.png}
+   \includegraphics[scale=0.5]{../data/images/NNPri.png}
    \caption{Class diagram}
   \end{figure}
 
 \subsection{Random forest}
-The parameters used for the random forest are the following :
-  \begin{itemize}
-    \item number of variable randomly selected sqrt(n) (usually the best number);
-  \end{itemize}
+
 Results :
 \begin{itemize}
   \item Correct classification : 87.25\%;
@@ -121,9 +111,10 @@ Results :
   \item False positive ad : 0.2833\%.
 \end{itemize}
 
+As we can see we get a bit of improvement on the false positive ads but on the other side we lose accuracy on the false positive non-ads 
 \begin{figure}[h]
  \centering
- \includegraphics[scale=0.5]{../images/NNPO.png}
+ \includegraphics[scale=0.5]{../data/images/RFPri.png}
  \caption{Class diagram}
 \end{figure}
 500
