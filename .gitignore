@@ -292,3 +292,5 @@ CTestTestfile.cmake
 
 c++
 *.ods
+*.jpg
+*.png
