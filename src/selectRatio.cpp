@@ -27,8 +27,7 @@ using namespace std;
 
 /******************************************************************************/
 
-int main( int argc, char** argv )
-{
+int main( int argc, char** argv ) {
 
 	vector<char *> inputlinesAd, inputlinesNonAd; 				// vector of input lines
 	vector<char *>::iterator outline;		// iterator for above
@@ -38,7 +37,7 @@ int main( int argc, char** argv )
   std::regex e (".*nonad\.");
 
 	int lineN = 0, count = 0, middle = 0,trainSampleN = 0;
-	double ratio, trainRatioWanted = 0.5, dataRatio = 0;
+	double ratio, trainRatioWanted = 0.5;
 
 	string fileName = argv[2], fTr, fTe;
 
@@ -47,21 +46,21 @@ int main( int argc, char** argv )
 	// open input file
 	FILE* fi = fopen( argv[1], "r" );
 
-	if( !fi ){
+	if( !fi ) {
 		printf("ERROR: cannot read input file %s\n",  argv[1]);
 		return -1; // all not OK
 	}
 
 	// open output file
 	FILE *fTrain = fopen(fTr.c_str(), "w");
-	if( !fTrain ){
+	if( !fTrain ) {
 		printf("ERROR: cannot create output file %s\n",  argv[2]);
 		fclose(fi);
 		return -1; // all not OK
 	}
 
 	FILE *fTest = fopen(fTe.c_str(), "w");
-	if( !fTest ){
+	if( !fTest ) {
 		printf("ERROR: cannot create output file %s\n",  argv[2]);
 		fclose(fi);
 		fclose(fTrain);
@@ -71,18 +70,14 @@ int main( int argc, char** argv )
 	if (argc >= 4) {
 		trainRatioWanted = atof(argv[3]);
 	}
-	if (argc >= 5) {
-		dataRatio = atof(argv[4]);
-	}
 
 
 	// read in all the lines of the file (allocating fresh memory for each)
-	while (!feof(fi))
-	{
+	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
 		fscanf(fi, "%[^\n]\n", line);
 
-    if (std::regex_match (line,e)){
+    if (std::regex_match (line,e)) {
       inputlinesNonAd.push_back(line);
     } else {
       inputlinesAd.push_back(line);
@@ -97,37 +92,31 @@ int main( int argc, char** argv )
 	std::cout << inputlinesAd.size() << std::endl;
 
 
-	if (dataRatio == 0) {
-		middle = inputlinesAd.size() * trainRatioWanted;
-		for(outline = inputlinesAd.begin(); outline < inputlinesAd.end(); outline++) {
-			if (lineN <= middle) {
-				fprintf(fTrain, "%s\n", *outline);
-				trainSampleN++;
-			} else {
-				fprintf(fTest, "%s\n", *outline);
-			}
-			lineN++;
-			free((void *) *outline); // free memory also, vector screwed from that point
+	middle = inputlinesAd.size() * trainRatioWanted;
+	for(outline = inputlinesAd.begin(); outline < inputlinesAd.end(); outline++) {
+		if (lineN <= middle) {
+			fprintf(fTrain, "%s\n", *outline);
+			trainSampleN++;
+		} else {
+			fprintf(fTest, "%s\n", *outline);
 		}
-
-		middle = inputlinesNonAd.size() * trainRatioWanted;
-		lineN = 0;
-		for(outline = inputlinesNonAd.begin(); outline < inputlinesNonAd.end(); outline++) {
-			if (lineN <= middle) {
-				trainSampleN++;
-				fprintf(fTrain, "%s\n", *outline);
-			} else {
-				fprintf(fTest, "%s\n", *outline);
-			}
-			lineN++;
-			free((void *) *outline); // free memory also, vector screwed from that point
-		}
-
-	} else if (dataRatio <= ratio) {
-		/* code */
-	} else {
-
+		lineN++;
+		free((void *) *outline); // free memory also, vector screwed from that point
 	}
+
+	middle = inputlinesNonAd.size() * trainRatioWanted;
+	lineN = 0;
+	for(outline = inputlinesNonAd.begin(); outline < inputlinesNonAd.end(); outline++) {
+		if (lineN <= middle) {
+			trainSampleN++;
+			fprintf(fTrain, "%s\n", *outline);
+		} else {
+			fprintf(fTest, "%s\n", *outline);
+		}
+		lineN++;
+		free((void *) *outline); // free memory also, vector screwed from that point
+	}
+
 
 	std::cout << "Number of train sample : " << trainSampleN << std::endl;
 	std::cout << "Number of test sample : " << count - trainSampleN << std::endl;

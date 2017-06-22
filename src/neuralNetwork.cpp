@@ -1,5 +1,5 @@
 // Example : ML assignment data reader 2011
-// usage: prog training_data_file testing_data_file
+// usage: prog trainingData_file testingData_file
 
 // For use with testing/training datasets of the same format as: ad_cranfield.data
 
@@ -22,178 +22,162 @@ using namespace cv; // OpenCV API is in the C++ "cv" namespace
 
 #define NUMBER_OF_TRAINING_SAMPLES 2006 // ** CHANGE TO YOUR NUMBER OF SAMPLES **
 #define ATTRIBUTES_PER_SAMPLE 1558
-#define NUMBER_OF_TESTING_SAMPLES 353  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
+#define NUMBER_OF_VALIDATION_SAMPLES 353  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
+#define NUMBER_OF_SAMPLES 2006
 
 #define NUMBER_OF_CLASSES 2
 /******************************************************************************/
 
 // loads the sample database from file (which is a CSV text file)
 
-int read_data_from_csv(const char* filename, Mat data, Mat classes,
-  int n_samples )
-  {
+int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples ) {
+  char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
 
-    char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
-
-    // if we can't read the input file then return 0
-    FILE* f = fopen( filename, "r" );
-    if( !f ) {
-      printf("ERROR: cannot read file %s\n",  filename);
-      return 0; // all not OK
-    }
-
-    // for each sample in the file
-
-    for(int line = 0; line < n_samples; line++) {
-
-      // for each attribute on the line in the file
-
-      for(int attribute = 0; attribute < (ATTRIBUTES_PER_SAMPLE + 1); attribute++) {
-        if (attribute < ATTRIBUTES_PER_SAMPLE) {
-
-          // first 256 elements (0-255) in each line are the attributes
-
-          if(fscanf(f, "%f,", &(data.at<float>(line, attribute))) != 1) {
-            std::cout << "Error while parsing file" << std::endl;
-            return 0;
-          }
-
-        }
-        else if (attribute == ATTRIBUTES_PER_SAMPLE) {
-
-          if(fscanf(f, "%s.\n", tmps) != 1) {
-            std::cout << "Error while parsing file" << std::endl;
-            return 0;
-          }
-          if (strcmp(tmps, "ad.") == 0) {
-            // adverts are class 1
-
-            classes.at<float>(line, 0) = 1.0;
-          }
-          else if (strcmp(tmps, "nonad.") == 0) {
-            // non adverts are class 2
-
-            classes.at<float>(line, 1) = 1.0;
-          }
-        }
-      }
-    }
-
-    fclose(f);
-    return 1; // all OK
+  // if we can't read the input file then return 0
+  FILE* f = fopen( filename, "r" );
+  if( !f ) {
+    printf("ERROR: cannot read file %s\n",  filename);
+    return 0; // all not OK
   }
 
-  std::vector<float> getMeans(Mat data) {
-    std::vector<float> means;
-    float sum = 0;
+  // for each sample in the file
+  for(int line = 0; line < n_samples; line++) {
 
-    for (int c = 0; c < data.cols; c++) {
-      for (int r = 0; r < data.rows; r++) {
-        sum = sum + data.at<float>(r,c);
-      }
-      means.push_back(sum / data.rows);
-      sum = 0;
-    }
-    return means;
-  }
+    // for each attribute on the line in the file
+    for(int attribute = 0; attribute < (ATTRIBUTES_PER_SAMPLE + 1); attribute++) {
+      if (attribute < ATTRIBUTES_PER_SAMPLE) {
 
-  std::vector<float> getSTD(Mat data, std::vector<float> means) {
-    std::vector<float> std;
-    float sum = 0;
-
-    for (int c = 0; c < data.cols; c++) {
-      for (int r = 0; r < data.rows; r++) {
-        sum = sum + pow(data.at<float>(r,c) - means.at(c),2);
-      }
-      // std::cout << sqrt(sum / data.rows) << std::endl;
-      std.push_back(sqrt(sum / data.rows));
-      sum = 0;
-    }
-    return std;
-  }
-
-  // int createNFold(const char* filename, std::vector<Mat> data, std::vector<Mat> classes, int nSamples, int nFolds) {
-  //   Mat class1, class2;
-  //   int nSamplesPerFold = nSamples / nFolds;
-  //   int nClass1;
-  //   if(read_data_from_csv(filename, class1, class2, nSamples)){
-  //     nClass1 = class1.rows / class2.rows * nSamplesPerFold;
-  //     for (int i = 0 ; i < nFolds ; i++) {
-  //       // push data for class1
-  //       data.push_back(class1(Rect(i*nClass1, 0, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold)));
-  //       classes.push_back(class1(Rect(i*nClass1, ATTRIBUTES_PER_SAMPLE, NUMBER_OF_CLASSES, nSamplesPerFold)));
-  //
-  //       // push data for class 2
-  //       data.push_back(class2(Rect(i*(nSamplesPerFold-nClass1), 0, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold)));
-  //       classes.push_back(class2(Rect(i*nClass1, ATTRIBUTES_PER_SAMPLE, NUMBER_OF_CLASSES, nSamplesPerFold)));
-  //     }
-  //   } else {
-  //     std::cout << "Error while parsing file." << std::endl;
-  //     return 0;
-  //   }
-  // }
-  /******************************************************************************/
-
-  int main( int argc, char** argv ) {
-
-    // define training data storage matrices (one for attribute examples, one
-    // for classifications)
-
-    //int nfold = 10;
-    int numberOfIterations = 10, paramMin = 10, step = 10,optimumParam = 0;
-    // std::vector<Mat> training_data;
-    // std::vector<Mat> training_classifications;
-    // //define testing data storage matrices
-    //
-    // std::vector<Mat> testing_data;
-    // std::vector<Mat> testing_classifications;
-    std::vector<float> means, std;
-    Mat training_data = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-    Mat training_classifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 2, CV_32FC1);
-
-    //define testing data storage matrices
-
-    Mat testing_data = Mat(NUMBER_OF_TESTING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-    Mat testing_classifications = Mat(NUMBER_OF_TESTING_SAMPLES, 2, CV_32FC1);
-
-    Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
-    Point max_loc = Point(0,0);
-    // load training and testing data sets
-
-    double currentError = 0, errorMin = 0;
-    std::ofstream myfile;
-    string csv = "csv/";
-    csv.append(argv[3]);
-    csv.append(".csv");
-
-    if (read_data_from_csv(argv[1], training_data, training_classifications, NUMBER_OF_TRAINING_SAMPLES) && read_data_from_csv(argv[2], testing_data, testing_classifications, NUMBER_OF_TESTING_SAMPLES)) {
-      myfile.open(csv);
-      means = getMeans(training_data);
-      std = getSTD(training_data, means);
-      //normalizing the training data
-      for (int c = 0; c < training_data.cols ; c++) {
-        for (int r = 0; r < training_data.rows ; r++) {
-          if (std.at(c) != 0) {
-            training_data.at<float>(r,c) = (training_data.at<float>(r,c) - means.at(c)) / std.at(c);
-          }
+        // first 256 elements (0-255) in each line are the attributes
+        if(fscanf(f, "%f,", &(data.at<float>(line, attribute))) != 1) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
         }
       }
-
-      //normalizing the testing data
-      for (int c = 0; c < testing_data.cols ; c++) {
-        for (int r = 0; r < testing_data.rows ; r++) {
-          if (std.at(c) != 0) {
-            testing_data.at<float>(r,c) = (testing_data.at<float>(r,c) - means.at(c)) / std.at(c);
-          }
+      else if (attribute == ATTRIBUTES_PER_SAMPLE) {
+        if(fscanf(f, "%s.\n", tmps) != 1) {
+          std::cout << "Error while parsing file" << std::endl;
+          return 0;
+        }
+        if (strcmp(tmps, "ad.") == 0) {
+          // adverts are class 1
+          classes.at<float>(line, 0) = 1.0;
+        }
+        else if (strcmp(tmps, "nonad.") == 0) {
+          // non adverts are class 2
+          classes.at<float>(line, 1) = 1.0;
         }
       }
+    }
+  }
+  fclose(f);
+  return 1; // all OK
+}
+
+void selectNFold(Mat data, Mat classes, Mat &trainingData, Mat &trainingClassifications, Mat &validationData, Mat &validationClassifications, int sampleNumber, int nFolds) {
+
+  int nSamplesPerFold = data.rows / nFolds;
+
+  //copy data for validation sample
+  data(Rect(0,nSamplesPerFold * (sampleNumber - 1),ATTRIBUTES_PER_SAMPLE, nSamplesPerFold )).copyTo(validationData);
+  classes(Rect(0,nSamplesPerFold * (sampleNumber - 1), NUMBER_OF_CLASSES, nSamplesPerFold )).copyTo(validationClassifications);
+
+  if (sampleNumber == 1) {
+
+    data(Rect(0, nSamplesPerFold, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (nFolds - 1))).copyTo(trainingData);
+    classes(Rect(0,nSamplesPerFold, NUMBER_OF_CLASSES, nSamplesPerFold * (nFolds - 1))).copyTo(trainingClassifications);
+
+  } else if (sampleNumber == nFolds) {
+
+    data(Rect(0, 0, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (nFolds - 1))).copyTo(trainingData);
+    classes(Rect(0, 0, NUMBER_OF_CLASSES, nSamplesPerFold * (nFolds - 1))).copyTo(trainingClassifications);
+
+  } else {
+
+    trainingData.resize(nSamplesPerFold * (nFolds - 1));
+    trainingClassifications.resize(nSamplesPerFold * (nFolds - 1));
+
+    //get first part of the dataset
+    data(Rect(0, 0, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (sampleNumber - 1))).copyTo(trainingData(Rect(0, 0, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (sampleNumber - 1))));
+    classes(Rect(0, 0, NUMBER_OF_CLASSES, nSamplesPerFold * (sampleNumber - 1))).copyTo(trainingClassifications(Rect(0, 0, NUMBER_OF_CLASSES, nSamplesPerFold * (sampleNumber - 1))));
+    //get second part of the dataset
+    data(Rect(0, nSamplesPerFold * sampleNumber, ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (nFolds - sampleNumber))).copyTo(trainingData(Rect(0, nSamplesPerFold * (sampleNumber - 1), ATTRIBUTES_PER_SAMPLE, nSamplesPerFold * (nFolds - sampleNumber))));
+    classes(Rect(0,nSamplesPerFold * sampleNumber, NUMBER_OF_CLASSES, nSamplesPerFold * (nFolds - sampleNumber))).copyTo(trainingClassifications(Rect(0, nSamplesPerFold * (sampleNumber - 1), NUMBER_OF_CLASSES, nSamplesPerFold * (nFolds - sampleNumber))));
+  }
+}
+
+/******************************************************************************/
+
+int main( int argc, char** argv ) {
+
+  // define training data storage matrices (one for attribute examples, one
+  // for classifications)
+  Mat trainingData = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat trainingClassifications = Mat(NUMBER_OF_TRAINING_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+
+  //define testing data storage matrices
+  Mat validationData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat validationClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+
+  Mat data = Mat(NUMBER_OF_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  Mat dataClassification = Mat(NUMBER_OF_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+
+  Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
+
+  //Point for finding the detected class
+  Point max_loc = Point(0,0);
+
+  //Creating matrix for validation
+  Mat validationSample;
+  int correctClass = 0, wrongClass = 0, falsePositives[NUMBER_OF_CLASSES] = {0,0};
+
+  //Vector for mean and std values
+  std::vector<float> means, std;
+
+  //Setting the variable for parameter otimization
+  int numberOfIterations = 10, paramMin = 10, step = 20, nFolds = 5, bestParam = paramMin;
+
+  //Error to be minimized
+  double errorMin = 100;
+
+  Scalar meanError;
+
+  Mat error = Mat(nFolds, numberOfIterations, CV_32FC1);
+  //Setting precision for display
+  std::cout.precision(4);
+
+  //Creating files to write the data to, will then be used for modelTester (model only, no training)
+  std::ofstream csvFile;
+  string csvName = "data/csv/", file = "data/models/";
+
+  //Try to read data from the input file
+  if (read_data_from_csv(argv[1], data, dataClassification, NUMBER_OF_TRAINING_SAMPLES)) {
+
+    //We look for the best results over all the folds
+    for (int fold = 1 ; fold <= nFolds ; fold++) {
+
+      std::cout << "Current fold : " << fold << std::endl;
+
+      //Select the current fold for validation and the rest for training
+      selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
+
+      //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
+
+        //Setting to 0 error variables
+        correctClass = 0;
+        wrongClass = 0;
+        for (int j = 0; j < NUMBER_OF_CLASSES; j++) {
+          falsePositives[j] = 0;
+        }
+
+        //Setting the layers, the number of neuron will ba what we try to optimize
         int layers_d[] = { ATTRIBUTES_PER_SAMPLE, paramMin + i * step, NUMBER_OF_CLASSES};
         Mat layers = Mat(1,3,CV_32SC1);
         layers.at<int>(0,0) = layers_d[0];
         layers.at<int>(0,1) = layers_d[1];
         layers.at<int>(0,2) = layers_d[2];
 
+        //We create the classifier
         CvANN_MLP* nnetwork = new CvANN_MLP;
         nnetwork->create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1);
 
@@ -201,87 +185,97 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes,
         CvANN_MLP_TrainParams params = CvANN_MLP_TrainParams( cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001), CvANN_MLP_TrainParams::BACKPROP, 0.1, 0.1);
 
         // train the neural network (using training data)
-        printf( "\nUsing training database: %s\n", argv[1]);
+        std::cout << "Training iteration for the classifier : " << i + 1 << std::endl;
 
-        int iterations = nnetwork->train(training_data, training_classifications, Mat(), Mat(), params);
+        int iterations = nnetwork->train(trainingData, trainingClassifications, Mat(), Mat(), params);
 
-        printf( "Training iterations: %i\n\n", iterations);
+        std::cout << "Number of iterations used to train the classifier : " << iterations << std::endl;
 
-        // perform classifier testing and report results
+        //We test it with the validation data
+        std::cout << "Calculating error on the validation sample." << std::endl;
 
-        Mat test_sample;
-        int correct_class = 0;
-        int wrong_class = 0;
-        int false_positives [NUMBER_OF_CLASSES] = {0,0};
+        for (int tsample = 0; tsample < validationData.rows; tsample++) {
 
-        printf( "\nUsing testing database: %s\n\n", argv[2]);
-
-        for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
-
-          // extract a row from the testing matrix
-          test_sample = testing_data.row(tsample);
+          // extract a row from the validation matrix
+          validationSample = validationData.row(tsample);
 
           // run neural network prediction
-          nnetwork->predict(test_sample, classificationResult);
+          nnetwork->predict(validationSample, classificationResult);
 
           minMaxLoc(classificationResult, 0, 0, 0, &max_loc);
 
-          if (testing_classifications.at<float>(tsample, max_loc.x) == 1) {
-            correct_class++;
-
+          //getting wrong and correct classification
+          if (validationClassifications.at<float>(tsample, max_loc.x) == 1) {
+            correctClass++;
           } else {
-            wrong_class++;
-            false_positives[(int) max_loc.x]++;
+            wrongClass++;
+            falsePositives[(int) max_loc.x]++;
           }
         }
 
-        printf( "\nResults on the testing database: %s\n"
-        "\tCorrect classification: %d (%g%%)\n"
-        "\tWrong classifications: %d (%g%%)\n",
-        argv[2],
-        correct_class, (double) correct_class*100/NUMBER_OF_TESTING_SAMPLES,
-        wrong_class, (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES);
+        std::cout << "Result on validation set :\n\tCorrect classification: " << correctClass << ", " << (double)correctClass*100/validationData.rows << "%\n\tWrong classifications: " << wrongClass << " " << (double) wrongClass*100/validationData.rows << "%" << std::endl;
 
-        for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-          printf( "\tClass (digit %d) false postives 	%d (%g%%)\n", i,
-          false_positives[i],
-          (double) false_positives[i]*100/NUMBER_OF_TESTING_SAMPLES);
-        }
+        std::cout << "\tClass nonad false postives : " << (double)falsePositives[1]*100/validationData.rows << std::endl;
+        std::cout << "\tClass ad false postives : " << (double)falsePositives[0]*100/validationData.rows << std::endl;
 
-        if (errorMin == 0) {
-          errorMin = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
-          currentError = errorMin;
-        } else {
-          currentError = (double) wrong_class*100/NUMBER_OF_TESTING_SAMPLES;
-        }
-
-        std::cout << errorMin << std::endl;
-        std::cout << currentError << std::endl;
-        //write to file for display
-        myfile << paramMin + i * step;
-        myfile << ",";
-        myfile << currentError;
-        myfile << ";\n";
-
-        if (argc == 4 && currentError <= errorMin) {
-          string file = "models/";
-          file.append(argv[3]);
-          file.append(".xml");
-          std::cout << file << std::endl;
-          nnetwork->save(file.c_str());
-          errorMin = currentError;
-          optimumParam = paramMin + i * step;
-        }
-        std::cout << optimumParam << std::endl;
-        // all OK : main returns 0
-
+        error.at<float>(fold-1,i) = (double) wrongClass*100/validationData.rows;
       }
-      myfile.close();
-      return 0;
     }
 
-    // not OK : main returns -1
 
-    return -1;
+    if (argc == 3) {
+      //File for the graphic
+      csvName.append(argv[2]);
+      csvName.append(".csv");
+      csvFile.open(csvName, std::ofstream::out | std::ofstream::trunc);
+    }
+
+    for (int i = 0; i < numberOfIterations ; i++) {
+      meanError = mean(error.col(i));
+      if (errorMin > meanError[0]) {
+        errorMin = meanError[0];
+        bestParam = paramMin + i * step;
+      }
+
+      if (argc == 3) {
+        csvFile << paramMin + i * step;
+        csvFile << ",";
+        csvFile << meanError[0];
+        csvFile << ";\n";
+      }
+    }
+
+    std::cout << "The best value for the parameter is : " << bestParam << std::endl;
+    std::cout << "The error for this parameter is : " << errorMin << std::endl;
+
+    //If model to save
+    if (argc == 3) {
+      //File path for model
+      file.append(argv[2]);
+      file.append(".xml");
+      //Calculating the model with the best parameter.
+      int layers_d[] = { ATTRIBUTES_PER_SAMPLE, bestParam, NUMBER_OF_CLASSES};
+      Mat layers = Mat(1,3,CV_32SC1);
+      layers.at<int>(0,0) = layers_d[0];
+      layers.at<int>(0,1) = layers_d[1];
+      layers.at<int>(0,2) = layers_d[2];
+
+      //We create the classifier
+      CvANN_MLP* nnetwork = new CvANN_MLP;
+      nnetwork->create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1);
+
+      // set the training parameters
+      CvANN_MLP_TrainParams params = CvANN_MLP_TrainParams( cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001), CvANN_MLP_TrainParams::BACKPROP, 0.1, 0.1);
+
+      std::cout << "Training the model with the best parameter on the whole dataset." << std::endl;
+
+      nnetwork->train(data, dataClassification, Mat(), Mat(), params);
+
+      nnetwork->save(file.c_str());
+
+      csvFile.close();
+    }
+    return 0;
   }
-  /******************************************************************************/
+  return -1;
+}

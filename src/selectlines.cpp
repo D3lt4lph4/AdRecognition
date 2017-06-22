@@ -23,8 +23,7 @@ using namespace std;
 
 /******************************************************************************/
 
-int main( int argc, char** argv )
-{
+int main( int argc, char** argv ) {
 
 	vector<char *> inputlines; 				// vector of input lines
 	vector<char *>::iterator outline;		// iterator for above
@@ -48,7 +47,7 @@ int main( int argc, char** argv )
 	// open input file
 
 	FILE* fi = fopen( argv[3], "r" );
-	if( !fi ){
+	if( !fi ) {
 		printf("ERROR: cannot read input file %s\n",  argv[1]);
 		return -1; // all not OK
 	}
@@ -56,15 +55,14 @@ int main( int argc, char** argv )
 	// open output file
 
 	FILE* fw = fopen( argv[4], "w" );
-	if( !fw ){
+	if( !fw ) {
 		printf("ERROR: cannot read output file %s\n",  argv[2]);
 		return -1; // all not OK
 	}
 
 	// read in all the lines of the file (allocating fresh memory for each)
 
-	while (!feof(fi))
-	{
+	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
 		fscanf(fi, "%[^\n]\n", line);
 		inputlines.push_back(line);
@@ -72,14 +70,11 @@ int main( int argc, char** argv )
 
 	// output seleted lines to output file
 
-	for(outline = inputlines.begin(); outline < inputlines.end(); outline++)
-	{
-		if ((lineN >= minL) && (lineN <= maxL))
-		{
+	for(outline = inputlines.begin(); outline < inputlines.end(); outline++) {
+		if ((lineN >= minL) && (lineN <= maxL)) {
 			fprintf(fw, "%s\n", *outline);
 		}
 		lineN++;
-
 		free((void *) *outline); // free memory also
 	}
 

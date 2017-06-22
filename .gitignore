@@ -291,3 +291,6 @@ compile_commands.json
 CTestTestfile.cmake
 
 c++
+*.ods
+*.jpg
+*.png

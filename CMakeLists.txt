@@ -23,17 +23,17 @@ ENDIF ( WIN32 )
 
 find_package( OpenCV REQUIRED )
 
-project(./bin/svm_test)
-add_executable(./bin/svm_test ./src/svm.cpp)
-target_link_libraries(./bin/svm_test ${OpenCV_LIBS} )
+project(./bin/svm)
+add_executable(./bin/svm ./src/svm.cpp)
+target_link_libraries(./bin/svm ${OpenCV_LIBS} )
 
-project(./bin/randomForest_test)
-add_executable(./bin/randomForest_test ./src/randomForest.cpp)
-target_link_libraries(./bin/randomForest_test ${OpenCV_LIBS} )
+project(./bin/randomForest)
+add_executable(./bin/randomForest ./src/randomForest.cpp)
+target_link_libraries(./bin/randomForest ${OpenCV_LIBS} )
 
-project(./bin/neuralNetwork_test)
-add_executable(./bin/neuralNetwork_test ./src/neuralNetwork.cpp)
-target_link_libraries(./bin/neuralNetwork_test ${OpenCV_LIBS} )
+project(./bin/neuralNetwork)
+add_executable(./bin/neuralNetwork ./src/neuralNetwork.cpp)
+target_link_libraries(./bin/neuralNetwork ${OpenCV_LIBS} )
 
 project(./bin/randomize)
 add_executable(./bin/randomize ./src/randomize.cpp)
