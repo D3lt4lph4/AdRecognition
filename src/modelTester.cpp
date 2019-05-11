@@ -157,9 +157,9 @@ int main(int argc, char** argv) {
   std::cout.precision(4);
 
   // Since polymorphisme is overrated (no function predict on the super class)
-  Ptr<SVM> model1;
-  Ptr<RTrees> model2;
-  Ptr<ANN_MLP> model3;
+  Ptr<SVM> model1 = SVM::create();
+  Ptr<RTrees> model2 = RTrees::create();
+  Ptr<ANN_MLP> model3 = ANN_MLP::create();
 
   long modelNumber = atoi(argv[3]);
 
