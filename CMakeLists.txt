@@ -1,8 +1,8 @@
 # this file is setup to build everything for the ML examples
 
 cmake_minimum_required (VERSION 2.6)
-set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS} -std=c++11" )
-
+set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS}" )
+set (CMAKE_CXX_STANDARD 11)
 # SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "CMakeCache.txt;CMakeFiles;cmake_install.cmake")
 
 # linux specific stuff
