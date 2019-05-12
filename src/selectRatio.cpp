@@ -86,10 +86,11 @@ int main( int argc, char** argv ) {
 	}
 
   ratio = inputlinesAd.size() / (double)count;
-	std::cout << "Current ratio for the data : " << ratio << std::endl;
-
-	std::cout << count << std::endl;
-	std::cout << inputlinesAd.size() << std::endl;
+	std::cout << "Current ratio for the data (ad/total): " << ratio << std::endl;
+	
+	std::cout << "Ads :" << inputlinesAd.size() << std::endl;
+	std::cout << "Total :" << count << std::endl;
+	
 
 
 	middle = inputlinesAd.size() * trainRatioWanted;

@@ -14,6 +14,7 @@
 #include <fstream>
 
 using namespace cv; // OpenCV API is in the C++ "cv" namespace
+using namespace cv::ml;
 
 #include <stdio.h>
 
@@ -122,9 +123,9 @@ int main( int argc, char** argv ) {
 
   // define all the attributes as numerical (** not needed for all ML techniques **)
   Mat varType = Mat(ATTRIBUTES_PER_SAMPLE + 1, 1, CV_8U );
-  varType.setTo(Scalar(CV_VAR_NUMERICAL) ); // all inputs are numerical
+  varType.setTo(Scalar(VAR_NUMERICAL) ); // all inputs are numerical
 
-  varType.at<uchar>(ATTRIBUTES_PER_SAMPLE, 0) = CV_VAR_CATEGORICAL;
+  varType.at<uchar>(ATTRIBUTES_PER_SAMPLE, 0) = VAR_CATEGORICAL;
 
   Mat validationSample;
   int correctClass = 0, wrongClass = 0, falsePositives[NUMBER_OF_CLASSES] = {0,0};
@@ -144,10 +145,11 @@ int main( int argc, char** argv ) {
   //Setting precision for display
   std::cout.precision(4);
 
-  float priors[] = {0.85,0.15};  // weights of each classification for classes
+  float priors_array[] = {0.85,0.15};  // weights of each classification for classes
+  Mat priors = Mat(1, 2, CV_32FC1, &priors_array);
   //Creating files to write the data to, will then be used for modelTester (model only, no training)
   std::ofstream csvFile;
-  string csvName = "data/csv/", file = "data/models/";
+  std::string csvName = "data/csv/", file = "data/models/";
 
   if (read_data_from_csv(argv[1], data, dataClassification, NUMBER_OF_TRAINING_SAMPLES)) {
 
@@ -158,6 +160,9 @@ int main( int argc, char** argv ) {
       //Select the current fold for validation and the rest for training
       selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
 
+      Ptr<TrainData> trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
+      Ptr<TrainData> valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
+
       //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
 
@@ -167,27 +172,22 @@ int main( int argc, char** argv ) {
         for (int j = 0; j < NUMBER_OF_CLASSES; j++) {
           falsePositives[j] = 0;
         }
-        CvRTParams params = CvRTParams(paramMin + i * step, // max depth
-          20, // min sample count
-          0, // regression accuracy: N/A here
-          false, // compute surrogate split, no missing data
-          15, // max number of categories (use sub-optimal algorithm for larger numbers)
-          priors, // the array of priors
-          false,  // calculate variable importance
-          0,       // number of variables randomly selected at node and used to find the best split(s).
-          100,	 // max number of trees in the forest
-          0.01f,				// forrest accuracy
-          CV_TERMCRIT_ITER |	CV_TERMCRIT_EPS // termination cirteria
-        );
+        
+        Ptr<RTrees> rtree = RTrees::create();
 
+        rtree->setMaxDepth(paramMin + i * step);
+        rtree->setMinSampleCount(20);
+        rtree->setRegressionAccuracy(0);
+        rtree->setMaxCategories(15);
+        rtree->setPriors(priors);
+        rtree->setCalculateVarImportance(false);
+        rtree->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 100, 1e-6));
 
         // train random forest classifier (using training data)
-
         std::cout << "Training iteration for the classifier : " << i+1 << std::endl;
 
-        CvRTrees* rtree = new CvRTrees;
-
-        rtree->train(trainingData, CV_ROW_SAMPLE, trainingClassifications, Mat(), Mat(), varType, Mat(), params);
+        
+        rtree->train(trainData);
 
         //We test it with the validation data
         std::cout << "Calculating error on the validation sample." << std::endl;
@@ -249,24 +249,19 @@ int main( int argc, char** argv ) {
       file.append(argv[2]);
       file.append(".xml");
       //Calculating the model with the best parameter.
-      CvRTParams params = CvRTParams(bestParam, // max depth
-        20, // min sample count
-        0, // regression accuracy: N/A here
-        false, // compute surrogate split, no missing data
-        15, // max number of categories (use sub-optimal algorithm for larger numbers)
-        priors, // the array of priors
-        false,  // calculate variable importance
-        0,       // number of variables randomly selected at node and used to find the best split(s).
-        100,	 // max number of trees in the forest
-        0.01f,				// forrest accuracy
-        CV_TERMCRIT_ITER |	CV_TERMCRIT_EPS // termination cirteria
-      );
+      Ptr<RTrees> rtree = RTrees::create();
 
+      rtree->setMaxDepth(bestParam);
+      rtree->setMinSampleCount(20);
+      rtree->setRegressionAccuracy(0);
+      rtree->setMaxCategories(15);
+      rtree->setPriors(priors);
+      rtree->setCalculateVarImportance(false);
+      rtree->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER + TermCriteria::EPS, 100, 1e-6));
 
-      // train random forest classifier (using training data)
-      CvRTrees* rtree = new CvRTrees;
+      Ptr<TrainData> tData = TrainData::create(data, SampleTypes::ROW_SAMPLE, dataClassification);
 
-      rtree->train(data, CV_ROW_SAMPLE, dataClassification, Mat(), Mat(), varType, Mat(), params);
+      rtree->train(tData);
 
       rtree->save(file.c_str());
 

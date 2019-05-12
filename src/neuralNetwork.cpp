@@ -14,6 +14,7 @@
 #include <fstream>
 
 using namespace cv; // OpenCV API is in the C++ "cv" namespace
+using namespace cv::ml;
 
 #include <stdio.h>
 
@@ -147,7 +148,7 @@ int main( int argc, char** argv ) {
 
   //Creating files to write the data to, will then be used for modelTester (model only, no training)
   std::ofstream csvFile;
-  string csvName = "data/csv/", file = "data/models/";
+  std::string csvName = "data/csv/", file = "data/models/";
 
   //Try to read data from the input file
   if (read_data_from_csv(argv[1], data, dataClassification, NUMBER_OF_TRAINING_SAMPLES)) {
@@ -159,6 +160,9 @@ int main( int argc, char** argv ) {
 
       //Select the current fold for validation and the rest for training
       selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
+      
+      Ptr<TrainData> trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
+      Ptr<TrainData> valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
 
       //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
@@ -178,16 +182,17 @@ int main( int argc, char** argv ) {
         layers.at<int>(0,2) = layers_d[2];
 
         //We create the classifier
-        CvANN_MLP* nnetwork = new CvANN_MLP;
-        nnetwork->create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1);
+        Ptr<ANN_MLP> nnetwork = ANN_MLP::create();
 
-        // set the training parameters
-        CvANN_MLP_TrainParams params = CvANN_MLP_TrainParams( cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001), CvANN_MLP_TrainParams::BACKPROP, 0.1, 0.1);
+        nnetwork->setLayerSizes(layers);
+        nnetwork->setActivationFunction(ANN_MLP::SIGMOID_SYM, 0.6, 1);
+        nnetwork->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001));
+        nnetwork->setTrainMethod(ANN_MLP::BACKPROP, 0.1, 0.1);
 
         // train the neural network (using training data)
         std::cout << "Training iteration for the classifier : " << i + 1 << std::endl;
 
-        int iterations = nnetwork->train(trainingData, trainingClassifications, Mat(), Mat(), params);
+        int iterations = nnetwork->train(trainData);
 
         std::cout << "Number of iterations used to train the classifier : " << iterations << std::endl;
 
@@ -261,15 +266,17 @@ int main( int argc, char** argv ) {
       layers.at<int>(0,2) = layers_d[2];
 
       //We create the classifier
-      CvANN_MLP* nnetwork = new CvANN_MLP;
-      nnetwork->create(layers, CvANN_MLP::SIGMOID_SYM, 0.6, 1);
+      Ptr<ANN_MLP> nnetwork = ANN_MLP::create();
 
-      // set the training parameters
-      CvANN_MLP_TrainParams params = CvANN_MLP_TrainParams( cvTermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001), CvANN_MLP_TrainParams::BACKPROP, 0.1, 0.1);
-
+      nnetwork->setLayerSizes(layers);
+      nnetwork->setActivationFunction(ANN_MLP::SIGMOID_SYM, 0.6, 1);
+      nnetwork->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001));
+      nnetwork->setTrainMethod(ANN_MLP::BACKPROP, 0.1, 0.1);
+      
+      Ptr<TrainData> nData = TrainData::create(data, SampleTypes::ROW_SAMPLE, dataClassification);
       std::cout << "Training the model with the best parameter on the whole dataset." << std::endl;
 
-      nnetwork->train(data, dataClassification, Mat(), Mat(), params);
+      nnetwork->train(nData);
 
       nnetwork->save(file.c_str());
 

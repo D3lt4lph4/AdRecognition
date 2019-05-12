@@ -22,20 +22,25 @@ using namespace cv::ml;
 /******************************************************************************/
 // global definitions (for speed and ease of use)
 
-#define NUMBER_OF_TRAINING_SAMPLES \
-  1606  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
 #define ATTRIBUTES_PER_SAMPLE 1558
-#define NUMBER_OF_VALIDATION_SAMPLES \
-  400  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
 
 #define NUMBER_OF_CLASSES 2
 /******************************************************************************/
 
 // loads the sample database from file (which is a CSV text file)
 
-int read_data_from_csv(const char* filename, Mat data, Mat classes,
-                       int n_samples) {
+int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
   char tmps[10];  // tmp string for reading the "ad." and "nonad." class labels
+  int n_samples = 0;
+
+  std::string line;
+  std::ifstream myfile(filename);
+
+  while (std::getline(myfile, line))
+      ++n_samples;
+
+  data.create(n_samples, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  classes.create(n_samples, 1, CV_32SC1);
 
   // if we can't read the input file then return 0
   FILE* f = fopen(filename, "r");
@@ -81,15 +86,12 @@ int read_data_from_csv(const char* filename, Mat data, Mat classes,
 int main(int argc, char** argv) {
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
-  Mat trainingData =
-      Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat trainingClassifications = Mat(NUMBER_OF_TRAINING_SAMPLES, 1, CV_32SC1);
+  Mat trainingData = Mat();
+  Mat trainingClassifications = Mat();
 
   // define testing data storage matrices
-  Mat validationData =
-      Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat validationClassifications =
-      Mat(NUMBER_OF_VALIDATION_SAMPLES, 1, CV_32SC1);
+  Mat validationData = Mat();
+  Mat validationClassifications = Mat();
 
   // Creating matrix for validation
   Mat validationSample;
@@ -117,15 +119,13 @@ int main(int argc, char** argv) {
     file.append(".xml");
   }
 
+
   // Try to read data from the input file
-  if (read_data_from_csv(argv[1], trainingData, trainingClassifications,
-                         NUMBER_OF_TRAINING_SAMPLES) &&
-      read_data_from_csv(argv[2], validationData, validationClassifications,
-                         NUMBER_OF_VALIDATION_SAMPLES)) {
-    
+  if (read_data_from_csv(argv[1], trainingData, trainingClassifications) &&
+      read_data_from_csv(argv[2], validationData, validationClassifications)) {
+
     Ptr<TrainData> trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
     Ptr<TrainData> valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
-
 
     // train SVM classifier (using training data)
 
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
 
     printf("\nUsing testing database: %s\n\n", argv[2]);
     Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
-    for (int tsample = 0; tsample < NUMBER_OF_VALIDATION_SAMPLES; tsample++) {
+    for (int tsample = 0; tsample < validationData.rows; tsample++) {
       // extract a row from the testing matrix
       validationSample = validationData.row(tsample);
 
@@ -176,9 +176,9 @@ int main(int argc, char** argv) {
 
     std::cout << "Result on validation set :\n\tCorrect classification: "
               << correctClass << ", "
-              << (double)correctClass * 100 / NUMBER_OF_VALIDATION_SAMPLES
+              << (double)correctClass * 100 / validationData.rows
               << "%\n\tWrong classifications: " << wrongClass << " "
-              << (double)wrongClass * 100 / NUMBER_OF_VALIDATION_SAMPLES << "%"
+              << (double)wrongClass * 100 / validationData.rows << "%"
               << std::endl;
 
     std::cout << "\tClass nonad false postives : "
@@ -189,10 +189,10 @@ int main(int argc, char** argv) {
               << std::endl;
 
     if (errorMin == 0) {
-      errorMin = (double)wrongClass * 100 / NUMBER_OF_VALIDATION_SAMPLES;
+      errorMin = (double)wrongClass * 100 / validationData.rows;
       currentError = errorMin;
     } else {
-      currentError = (double)wrongClass * 100 / NUMBER_OF_VALIDATION_SAMPLES;
+      currentError = (double)wrongClass * 100 / validationData.rows;
     }
 
     if (argc == 4) {
