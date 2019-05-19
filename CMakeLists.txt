@@ -1,27 +1,16 @@
 # this file is setup to build everything for the ML examples
 
 cmake_minimum_required (VERSION 2.6)
+
+project(AdRecognition)
+
 set( CMAKE_CXX_FLAGS "-O3 -Wall ${CMAKE_CXX_FLAGS}" )
 set (CMAKE_CXX_STANDARD 11)
 # SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "CMakeCache.txt;CMakeFiles;cmake_install.cmake")
 
-# linux specific stuff
-
-IF ( UNIX )
-   set( CMAKE_PREFIX_PATH "/d1/benjamin/opencv/opencv-2.4.13" )
-   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
-   MESSAGE( "LINUX CONFIG" )
-ENDIF ( UNIX )
-
-# windows (inc. 64-bit specific stuff)
-
-IF ( WIN32 )
-   set( CMAKE_PREFIX_PATH "C:/OpenCV2.4/build" )
-   set( OpenCV_DIR "C:/OpenCV2.4/build" )
-   MESSAGE( "WINDOWS CONFIG" )
-ENDIF ( WIN32 )
-
 find_package( OpenCV REQUIRED )
+
+file(MAKE_DIRECTORY ./bin)
 
 project(./bin/svm)
 add_executable(./bin/svm ./src/svm.cpp)
