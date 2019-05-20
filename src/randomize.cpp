@@ -19,17 +19,13 @@ using namespace std;
 
 #define LINELENGTHMAX 5000 // all file lines less than 5000 chars
 
-/******************************************************************************/
-
 int main( int argc, char** argv ) {
 
-	vector<char *> inputlines; 				// vector of input lines
-	vector<char *>::iterator outline;		// iterator for above
-
-	char * line = NULL;						// tmp pointer for line memory
+	vector<char *> inputlines;
+	vector<char *>::iterator outline;
+	char * line = NULL;
 
 	// open input file
-
 	FILE* fi = fopen( argv[1], "r" );
 	if( !fi ) {
 		printf("ERROR: cannot read input file %s\n",  argv[1]);
@@ -37,7 +33,6 @@ int main( int argc, char** argv ) {
 	}
 
 	// open output file
-
 	FILE* fw = fopen( argv[2], "w" );
 	if( !fw ) {
 		printf("ERROR: cannot read output file %s\n",  argv[2]);
@@ -45,7 +40,6 @@ int main( int argc, char** argv ) {
 	}
 
 	// read in all the lines of the file (allocating fresh memory for each)
-
 	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
 		fscanf(fi, "%[^\n]\n", line);
@@ -53,7 +47,6 @@ int main( int argc, char** argv ) {
 	}
 
 	// shuffle input file lines
-
 	// "This algorithm is described in section 3.4.2 of Knuth (D. E. Knuth,
 	// The Art of Computer Programming. Volume 2: Seminumerical Algorithms,
 	// second edition. Addison-Wesley, 1981). Knuth credits Moses and
@@ -61,8 +54,7 @@ int main( int argc, char** argv ) {
 	// - SGI STL manual, http://www.sgi.com/tech/stl/random_shuffle.html
 	random_shuffle(inputlines.begin(), inputlines.end());
 
-	// output all of the lines to output file
-
+	// Write all of the lines to output file
 	for(outline = inputlines.begin(); outline < inputlines.end(); outline++) {
 		fprintf(fw, "%s\n", *outline);
 		free((void *) *outline); // free memory also
@@ -72,6 +64,5 @@ int main( int argc, char** argv ) {
 	fclose(fi);
 	fclose(fw);
 
-	return 1; // all OK
+	return 1;
 }
-/******************************************************************************/
