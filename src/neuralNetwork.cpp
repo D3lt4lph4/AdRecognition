@@ -21,57 +21,58 @@ using namespace cv::ml;
 /******************************************************************************/
 // global definitions (for speed and ease of use)
 
-#define NUMBER_OF_TRAINING_SAMPLES 2006 // ** CHANGE TO YOUR NUMBER OF SAMPLES **
 #define ATTRIBUTES_PER_SAMPLE 1558
-#define NUMBER_OF_VALIDATION_SAMPLES 353  // ** CHANGE TO YOUR NUMBER OF SAMPLES **
-#define NUMBER_OF_SAMPLES 2006
 
 #define NUMBER_OF_CLASSES 2
 /******************************************************************************/
 
 // loads the sample database from file (which is a CSV text file)
+// Function to load from the csv datafiles.
+int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
+  int n_samples = 0;
 
-int read_data_from_csv(const char* filename, Mat data, Mat classes, int n_samples ) {
-  char tmps[10]; // tmp string for reading the "ad." and "nonad." class labels
+  std::string line;
+  std::ifstream my_file(filename);
+  std::string::size_type sz;
+  float value;
 
-  // if we can't read the input file then return 0
-  FILE* f = fopen( filename, "r" );
-  if( !f ) {
-    printf("ERROR: cannot read file %s\n",  filename);
-    return 0; // all not OK
-  }
+  // Getting the number of lines.
+  while (std::getline(my_file, line))
+      ++n_samples;
+
+  my_file.close();
+  // iterator might be invalidated from getline()
+  my_file.open(filename);
+
+  // Creating the matrices to hold the data.
+  data.create(n_samples, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  classes.create(n_samples, 1, CV_32SC1);
 
   // for each sample in the file
-  for(int line = 0; line < n_samples; line++) {
-
+  for (int line_nb = 0; line_nb < n_samples; line_nb++) {
     // for each attribute on the line in the file
-    for(int attribute = 0; attribute < (ATTRIBUTES_PER_SAMPLE + 1); attribute++) {
-      if (attribute < ATTRIBUTES_PER_SAMPLE) {
+    std::getline(my_file, line);
 
-        // first 256 elements (0-255) in each line are the attributes
-        if(fscanf(f, "%f,", &(data.at<float>(line, attribute))) != 1) {
-          std::cout << "Error while parsing file" << std::endl;
-          return 0;
-        }
-      }
-      else if (attribute == ATTRIBUTES_PER_SAMPLE) {
-        if(fscanf(f, "%s.\n", tmps) != 1) {
-          std::cout << "Error while parsing file" << std::endl;
-          return 0;
-        }
-        if (strcmp(tmps, "ad.") == 0) {
+    for (int attribute = 0; attribute < (ATTRIBUTES_PER_SAMPLE + 1);
+         attribute++) {
+      if (attribute == ATTRIBUTES_PER_SAMPLE) {
+        if (line.compare("ad.") == 0) {
           // adverts are class 1
-          classes.at<float>(line, 0) = 1.0;
+          classes.at<float>(line_nb, 0) = 1.0;
+        } else if (line.compare("nonad.") == 0) {
+          // non adverts are class 0
+          classes.at<float>(line_nb, 0) = 0.0;
         }
-        else if (strcmp(tmps, "nonad.") == 0) {
-          // non adverts are class 2
-          classes.at<float>(line, 1) = 1.0;
-        }
+      } else {
+        // store all other data as floating point
+        value = std::stof(line, &sz);
+        // + 1 for the ','
+        line = line.substr(sz + 1);
+        data.at<float>(line_nb, attribute) = value;
       }
     }
   }
-  fclose(f);
-  return 1; // all OK
+  return 1;  // all OK
 }
 
 void selectNFold(Mat data, Mat classes, Mat &trainingData, Mat &trainingClassifications, Mat &validationData, Mat &validationClassifications, int sampleNumber, int nFolds) {
@@ -112,12 +113,12 @@ int main( int argc, char** argv ) {
 
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
-  Mat trainingData = Mat(NUMBER_OF_TRAINING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat trainingClassifications = Mat(NUMBER_OF_TRAINING_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+  Mat trainingData = Mat();
+  Mat trainingClassifications = Mat();
 
   //define testing data storage matrices
-  Mat validationData = Mat(NUMBER_OF_VALIDATION_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat validationClassifications = Mat(NUMBER_OF_VALIDATION_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+  Mat validationData = Mat();
+  Mat validationClassifications = Mat();
 
   Mat data = Mat(NUMBER_OF_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
   Mat dataClassification = Mat(NUMBER_OF_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
