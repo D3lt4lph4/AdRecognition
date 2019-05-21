@@ -47,8 +47,8 @@ mv data/ad_cranfieldRandomizedSubSub.test data/ad_cranfieldRandomizedSubSub.val
 
 # Again with the random forest
 
-# ... And the SVM
-./bin/svm data/ad_cranfieldRandomizedSubSub.train data/ad_cranfieldRandomizedSubSub.val svm
+# ... And the SVM (kfold is used so we don't use the SubSub files)
+./bin/svm data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test svm
 
 # We check the models correctly saved
 ```

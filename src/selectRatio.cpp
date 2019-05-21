@@ -25,26 +25,25 @@ using namespace std;
 
 #define LINELENGTHMAX 5000 // all file lines less than 5000 chars
 
-/******************************************************************************/
-
 int main( int argc, char** argv ) {
 
-	vector<char *> inputlinesAd, inputlinesNonAd; 				// vector of input lines
-	vector<char *>::iterator outline;		// iterator for above
+	vector<char *> inputlinesAd, inputlinesNonAd;
+	vector<char *>::iterator outline;
 
-  char * line = NULL;
+  char* line = NULL;
 
-  std::regex e (".*nonad\.");
+  std::regex e(".*nonad\.");
 
-	int lineN = 0, count = 0, middle = 0,trainSampleN = 0;
+	int lineN = 0, count = 0, middle = 0, trainSampleN = 0;
 	double ratio, trainRatioWanted = 0.5;
 
 	string fileName = argv[2], fTr, fTe;
 
 	fileName = "data/" + fileName;
 	fTr = fileName + ".train", fTe = fileName + ".test";
+
 	// open input file
-	FILE* fi = fopen( argv[1], "r" );
+	FILE* fi = fopen(argv[1], "r");
 
 	if( !fi ) {
 		printf("ERROR: cannot read input file %s\n",  argv[1]);
@@ -71,7 +70,6 @@ int main( int argc, char** argv ) {
 		trainRatioWanted = atof(argv[3]);
 	}
 
-
 	// read in all the lines of the file (allocating fresh memory for each)
 	while (!feof(fi)) {
 		line = (char *) malloc(LINELENGTHMAX * sizeof(char));
@@ -87,13 +85,13 @@ int main( int argc, char** argv ) {
 
   ratio = inputlinesAd.size() / (double)count;
 	std::cout << "Current ratio for the data (ad/total): " << ratio << std::endl;
-	
 	std::cout << "Ads :" << inputlinesAd.size() << std::endl;
 	std::cout << "Total :" << count << std::endl;
 	
-
-
+	// Find the middle index for the ads
 	middle = inputlinesAd.size() * trainRatioWanted;
+
+	// Writing the data in the files
 	for(outline = inputlinesAd.begin(); outline < inputlinesAd.end(); outline++) {
 		if (lineN <= middle) {
 			fprintf(fTrain, "%s\n", *outline);
@@ -105,8 +103,11 @@ int main( int argc, char** argv ) {
 		free((void *) *outline); // free memory also, vector screwed from that point
 	}
 
+	// Find the middle index for the non-ads
 	middle = inputlinesNonAd.size() * trainRatioWanted;
 	lineN = 0;
+
+	// Writing the data in the files
 	for(outline = inputlinesNonAd.begin(); outline < inputlinesNonAd.end(); outline++) {
 		if (lineN <= middle) {
 			trainSampleN++;
@@ -118,7 +119,6 @@ int main( int argc, char** argv ) {
 		free((void *) *outline); // free memory also, vector screwed from that point
 	}
 
-
 	std::cout << "Number of train sample : " << trainSampleN << std::endl;
 	std::cout << "Number of test sample : " << count - trainSampleN << std::endl;
 
@@ -128,4 +128,3 @@ int main( int argc, char** argv ) {
 
 	return 1; // all OK
 }
-/******************************************************************************/

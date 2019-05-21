@@ -1,5 +1,5 @@
 // Example : ML assignment data reader 2011
-// usage: prog trainingData_file validationData_file
+// usage: prog trainingData_file testData_file
 
 // For use with testing/training datasets of the same format as:
 // ad_cranfield.data
@@ -82,12 +82,12 @@ int main(int argc, char** argv) {
   Mat trainingData = Mat();
   Mat trainingClassifications = Mat();
 
-  // define testing data storage matrices
-  Mat validationData = Mat();
-  Mat validationClassifications = Mat();
+  // define validation data storage matrices
+  Mat testData = Mat();
+  Mat testClassifications = Mat();
 
   // Creating matrix for validation
-  Mat validationSample;
+  Mat testSample;
   int correctClass = 0, wrongClass = 0,
       falsePositives[NUMBER_OF_CLASSES] = {0, 0}, kFold = 5;
   float result;
@@ -112,16 +112,13 @@ int main(int argc, char** argv) {
     file.append(".xml");
   }
 
-
   // Try to read data from the input file
   if (read_data_from_csv(argv[1], trainingData, trainingClassifications) &&
-      read_data_from_csv(argv[2], validationData, validationClassifications)) {
+      read_data_from_csv(argv[2], testData, testClassifications)) {
 
     Ptr<TrainData> trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
-    Ptr<TrainData> valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
 
-    // train SVM classifier (using training data)
-
+    // Creating the svm
     Ptr<SVM> svm = SVM::create();
 
     svm->setKernel(SVM::SIGMOID);
@@ -142,24 +139,25 @@ int main(int argc, char** argv) {
     svm->trainAuto(trainData, kFold);
 
     // svm->train(trainingData, trainingClassifications, Mat(), Mat(), params);
-    std::cout << "\nUsing optimal parameters degree" << svm->getDegree()
-              << ", gamma " << svm->getGamma() << ", ceof0 " << svm->getCoef0()
-              << "\n\t C " << svm->getC() << ", nu " << svm->getNu() << ", p "
+    std::cout << "\nUsing optimal parameters degree: " << svm->getDegree()
+              << ", gamma: " << svm->getGamma() << ", ceof0: " << svm->getCoef0()
+              << ", C: " << svm->getC() << ", nu: " << svm->getNu() << ", p: "
               << svm->getP() << "\n Training ...... Done\n"
               << std::endl;
     std::cout << "Number of support vectors for trained SVM = "
               << svm->getSupportVectors().rows << std::endl;
 
     printf("\nUsing testing database: %s\n\n", argv[2]);
+
     Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
-    for (int tsample = 0; tsample < validationData.rows; tsample++) {
+    for (int tsample = 0; tsample < testData.rows; tsample++) {
       // extract a row from the testing matrix
-      validationSample = validationData.row(tsample);
+      testSample = testData.row(tsample);
 
       // run SVM classifier
-      result = svm->predict(validationSample, classificationResult);
+      result = svm->predict(testSample, classificationResult);
 
-      if (result == validationClassifications.at<float>(tsample, 0)) {
+      if (result == testClassifications.at<float>(tsample, 0)) {
         correctClass++;
       } else {
         wrongClass++;
@@ -167,25 +165,25 @@ int main(int argc, char** argv) {
       }
     }
 
-    std::cout << "Result on validation set :\n\tCorrect classification: "
+    std::cout << "Result on test set :\n\tCorrect classification: "
               << correctClass << ", "
-              << (double)correctClass * 100 / validationData.rows
+              << (double)correctClass * 100 / testData.rows
               << "%\n\tWrong classifications: " << wrongClass << " "
-              << (double)wrongClass * 100 / validationData.rows << "%"
+              << (double)wrongClass * 100 / testData.rows << "%"
               << std::endl;
 
     std::cout << "\tClass nonad false postives : "
-              << (double)falsePositives[1] * 100 / validationData.rows
+              << (double)falsePositives[1] * 100 / testData.rows
               << std::endl;
     std::cout << "\tClass ad false postives : "
-              << (double)falsePositives[0] * 100 / validationData.rows
+              << (double)falsePositives[0] * 100 / testData.rows
               << std::endl;
 
     if (errorMin == 0) {
-      errorMin = (double)wrongClass * 100 / validationData.rows;
+      errorMin = (double)wrongClass * 100 / testData.rows;
       currentError = errorMin;
     } else {
-      currentError = (double)wrongClass * 100 / validationData.rows;
+      currentError = (double)wrongClass * 100 / testData.rows;
     }
 
     if (argc == 4) {
