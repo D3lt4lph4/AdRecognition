@@ -46,6 +46,7 @@ mv data/ad_cranfieldRandomizedSubSub.test data/ad_cranfieldRandomizedSubSub.val
 # Now let's train some neural network
 
 # Again with the random forest
+./bin/randomForest data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test randomForest 
 
 # ... And the SVM (kfold is used so we don't use the SubSub files)
 ./bin/svm data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test svm
