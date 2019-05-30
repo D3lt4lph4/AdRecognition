@@ -7,27 +7,20 @@
 // and set defintion below to 1 to print out input data
 
 /******************************************************************************/
-
-#include <cv.h>       // opencv general include file
-#include <ml.h>		  // opencv machine learning include file
+#include <cv.h>
+#include <ml.h>
 #include <iostream>
 #include <fstream>
 
-using namespace cv; // OpenCV API is in the C++ "cv" namespace
+using namespace cv;
 using namespace cv::ml;
 
 #include <stdio.h>
 
-/******************************************************************************/
-// global definitions (for speed and ease of use)
-
 #define ATTRIBUTES_PER_SAMPLE 1558
 
 #define NUMBER_OF_CLASSES 2
-/******************************************************************************/
 
-// loads the sample database from file (which is a CSV text file)
-// Function to load from the csv datafiles.
 int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
   int n_samples = 0;
 
@@ -36,7 +29,7 @@ int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
   std::string::size_type sz;
   float value;
 
-  // Getting the number of lines.
+  // Getting the number of lines
   while (std::getline(my_file, line))
       ++n_samples;
 
@@ -46,7 +39,7 @@ int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
 
   // Creating the matrices to hold the data.
   data.create(n_samples, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  classes.create(n_samples, 1, CV_32SC1);
+  classes.create(n_samples, NUMBER_OF_CLASSES, CV_32FC1);
 
   // for each sample in the file
   for (int line_nb = 0; line_nb < n_samples; line_nb++) {
@@ -61,7 +54,7 @@ int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
           classes.at<float>(line_nb, 0) = 1.0;
         } else if (line.compare("nonad.") == 0) {
           // non adverts are class 0
-          classes.at<float>(line_nb, 0) = 0.0;
+          classes.at<float>(line_nb, 1) = 1.0;
         }
       } else {
         // store all other data as floating point
@@ -78,6 +71,13 @@ int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
 void selectNFold(Mat data, Mat classes, Mat &trainingData, Mat &trainingClassifications, Mat &validationData, Mat &validationClassifications, int sampleNumber, int nFolds) {
 
   int nSamplesPerFold = data.rows / nFolds;
+
+  // Create the matrices to hold the data
+  validationData.create(nSamplesPerFold, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  validationClassifications.create(nSamplesPerFold, NUMBER_OF_CLASSES, CV_32FC1);
+
+  trainingData.create(nSamplesPerFold * (nFolds - 1), ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+  trainingClassifications.create(nSamplesPerFold * (nFolds - 1), NUMBER_OF_CLASSES, CV_32FC1);
 
   //copy data for validation sample
   data(Rect(0,nSamplesPerFold * (sampleNumber - 1),ATTRIBUTES_PER_SAMPLE, nSamplesPerFold )).copyTo(validationData);
@@ -120,8 +120,8 @@ int main( int argc, char** argv ) {
   Mat validationData = Mat();
   Mat validationClassifications = Mat();
 
-  Mat data = Mat(NUMBER_OF_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
-  Mat dataClassification = Mat(NUMBER_OF_SAMPLES, NUMBER_OF_CLASSES, CV_32FC1);
+  Mat data = Mat();
+  Mat dataClassification = Mat();
 
   Mat classificationResult = Mat(1, NUMBER_OF_CLASSES, CV_32FC1);
 
@@ -152,7 +152,7 @@ int main( int argc, char** argv ) {
   std::string csvName = "data/csv/", file = "data/models/";
 
   //Try to read data from the input file
-  if (read_data_from_csv(argv[1], data, dataClassification, NUMBER_OF_TRAINING_SAMPLES)) {
+  if (read_data_from_csv(argv[1], data, dataClassification)) {
 
     //We look for the best results over all the folds
     for (int fold = 1 ; fold <= nFolds ; fold++) {
@@ -186,9 +186,9 @@ int main( int argc, char** argv ) {
         Ptr<ANN_MLP> nnetwork = ANN_MLP::create();
 
         nnetwork->setLayerSizes(layers);
-        nnetwork->setActivationFunction(ANN_MLP::SIGMOID_SYM, 0.6, 1);
-        nnetwork->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.000001));
-        nnetwork->setTrainMethod(ANN_MLP::BACKPROP, 0.1, 0.1);
+        nnetwork->setActivationFunction(ANN_MLP::SIGMOID_SYM, 1, 1);
+        nnetwork->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 1000, 0.01));
+        nnetwork->setTrainMethod(ANN_MLP::BACKPROP);
 
         // train the neural network (using training data)
         std::cout << "Training iteration for the classifier : " << i + 1 << std::endl;
