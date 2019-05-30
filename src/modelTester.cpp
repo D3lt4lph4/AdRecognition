@@ -151,7 +151,7 @@ void normalizeData(const std::vector<float> means, const std::vector<float> std,
 int main(int argc, char** argv) {
   // define testing data storage matrices
   Mat testingData =
-      Mat(NUMBER_OF_TESTING_SAMPLES, ATTRIBUTES_PER_SAMPLE, CV_32FC1);
+      Mat();
 
   // Setting precision for the display
   std::cout.precision(4);
@@ -181,16 +181,16 @@ int main(int argc, char** argv) {
 
   // If Neural Network
   if (modelNumber == 3) {
-    Mat testingClassifications = Mat(NUMBER_OF_TESTING_SAMPLES, 2, CV_32FC1);
+    Mat testingClassifications = Mat();
     if (read_data_from_csv_cnn(argv[1], testingData, testingClassifications,
-                               NUMBER_OF_TESTING_SAMPLES)) {
+                               2)) {
       model3->load(argv[2]);
       if (argc == 5) {
         normalizeData(means, std, testingData);
       }
       std::cout << "\nCalculating the class for each sample\n\n";
 
-      for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
+      for (int tsample = 0; tsample < 2; tsample++) {
         // extract a row from the testing matrix
         testSample = testingData.row(tsample);
         result = model3->predict(testSample, classificationResult);
@@ -206,24 +206,23 @@ int main(int argc, char** argv) {
 
       std::cout << "Result on testing set :\n\tCorrect classification: "
                 << correctClass << ", "
-                << (double)correctClass * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)correctClass * 100 /2 
                 << "%\n\tWrong classifications: " << wrongClass << " "
-                << (double)wrongClass * 100 / NUMBER_OF_TESTING_SAMPLES << "%"
+                << (double)wrongClass * 100 / 2<< "%"
                 << std::endl;
 
       std::cout << "\tClass nonad false postives : "
-                << (double)falsePositives[1] * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)falsePositives[1] * 100 /2 
                 << std::endl;
       std::cout << "\tClass ad false postives : "
-                << (double)falsePositives[0] * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)falsePositives[0] * 100 /2
                 << std::endl;
 
       return 0;
     }
   } else {  // Else svm or Random Forest
-    Mat testingClassifications = Mat(NUMBER_OF_TESTING_SAMPLES, 1, CV_32FC1);
-    if (read_data_from_csv(argv[1], testingData, testingClassifications,
-                           NUMBER_OF_TESTING_SAMPLES)) {
+    Mat testingClassifications = Mat();
+    if (read_data_from_csv(argv[1], testingData, testingClassifications)) {
       if (argc == 5) {
         normalizeData(means, std, testingData);
       }
@@ -242,7 +241,7 @@ int main(int argc, char** argv) {
 
       printf("\nCalculating the class for each sample: %s\n\n", argv[2]);
 
-      for (int tsample = 0; tsample < NUMBER_OF_TESTING_SAMPLES; tsample++) {
+      for (int tsample = 0; tsample < 2; tsample++) {
         // extract a row from the testing matrix
         testSample = testingData.row(tsample);
 
@@ -275,16 +274,16 @@ int main(int argc, char** argv) {
       std::cout << "digit 0 = nonad and 1 = ad" << std::endl;
       std::cout << "Result on testing set :\n\tCorrect classification: "
                 << correctClass << ", "
-                << (double)correctClass * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)correctClass * 100 / 2
                 << "%\n\tWrong classifications: " << wrongClass << " "
-                << (double)wrongClass * 100 / NUMBER_OF_TESTING_SAMPLES << "%"
+                << (double)wrongClass * 100 / 2<< "%"
                 << std::endl;
 
       std::cout << "\tClass nonad false postives : "
-                << (double)falsePositives[0] * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)falsePositives[0] * 100 / 2
                 << std::endl;
       std::cout << "\tClass ad false postives : "
-                << (double)falsePositives[1] * 100 / NUMBER_OF_TESTING_SAMPLES
+                << (double)falsePositives[1] * 100 / 2
                 << std::endl;
       return 0;
     }
