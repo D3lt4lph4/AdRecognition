@@ -74,8 +74,6 @@ int read_data_from_csv(const char* filename, Mat &data, Mat &classes) {
   return 1;  // all OK
 }
 
-/******************************************************************************/
-
 int main(int argc, char** argv) {
   // define training data storage matrices (one for attribute examples, one
   // for classifications)
