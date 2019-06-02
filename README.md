@@ -44,6 +44,7 @@ They can be used as shown in the examples below:
 mv data/ad_cranfieldRandomizedSubSub.test data/ad_cranfieldRandomizedSubSub.val
 
 # Now let's train some neural network
+./bin/neuralNetwork data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test neuralNetwork
 
 # Again with the random forest
 ./bin/randomForest data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test randomForest 
@@ -51,20 +52,25 @@ mv data/ad_cranfieldRandomizedSubSub.test data/ad_cranfieldRandomizedSubSub.val
 # ... And the SVM (kfold is used so we don't use the SubSub files)
 ./bin/svm data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test svm
 
-# We check the models correctly saved
+# We check the models
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/svm.xml
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/rf.xml
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/nn.xml
 ```
 
 ## Description of the files
 
 The data folders contains different types of files.
+
 The data files:
 
-- ad_cranfield.name file - an explanation of the data
-- ad_cranfield.data file - the set of data (CSV file format)
-- ad_cranfieldSub.data/ad_cranfieldSub.test
-- ad_cranfieldSubSub.train/ad_cranfieldSubSub.valid
+- ad_cranfield.name file - An explanation of the data
+- ad_cranfield.data file - The set of data (CSV file format)
+- ad_cranfieldRandomized.data - The randomized dataset
+- ad_cranfieldRandomizedSub.train/ad_cranfieldRandomizedSub.test - The randomized dataset split into train and test sets
+- ad_cranfieldRandomizedSubSub.train/ad_cranfieldRandomizedSubSub.val - The randomized train set split into train and validation
 
-Runs saved for the different programs
+The models files, train example models.
 
 ## Credits
 
