@@ -9,8 +9,6 @@ The programs were tested with OpenCV 3.4.2. Some modifications are to be applied
 Compiling the project:
 
 ```bash
-mkdir bin
-
 cmake .
 make
 ```
@@ -37,13 +35,7 @@ They can be used as shown in the examples below:
 # Then we split in two sets, one for training and one for testing
 ./bin/selectRatio data/ad_cranfieldRandomized.data ad_cranfieldRandomizedSub 0.8
 
-# Split again to have validation and training sets
-./bin/selectRatio data/ad_cranfieldRandomizedSub.train ad_cranfieldRandomizedSubSub 0.
-
-# Quick rename
-mv data/ad_cranfieldRandomizedSubSub.test data/ad_cranfieldRandomizedSubSub.val
-
-# Now let's train some neural network
+# Now let's train the neural network
 ./bin/neuralNetwork data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test neuralNetwork
 
 # Again with the random forest

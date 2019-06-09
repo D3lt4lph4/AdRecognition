@@ -132,6 +132,7 @@ int main( int argc, char** argv ) {
 
   Scalar meanError;
   Ptr<ANN_MLP> nnetwork;
+  Ptr<TrainData> trainData, valData;
 
   Mat error = Mat(nFolds, numberOfIterations, CV_32FC1);
   //Setting precision for display
@@ -151,8 +152,8 @@ int main( int argc, char** argv ) {
       //Select the current fold for validation and the rest for training
       selectNFold(data, dataClassification, trainingData, trainingClassifications, validationData, validationClassifications, fold, nFolds);
       
-      Ptr<TrainData> trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
-      Ptr<TrainData> valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
+      trainData = TrainData::create(trainingData, SampleTypes::ROW_SAMPLE, trainingClassifications);
+      valData = TrainData::create(validationData, SampleTypes::ROW_SAMPLE, validationClassifications);
 
       //We try to get the best parameter for the model
       for (int i = 0; i < numberOfIterations; i++) {
@@ -182,9 +183,7 @@ int main( int argc, char** argv ) {
         // train the neural network (using training data)
         std::cout << "Training iteration for the classifier : " << i + 1 << std::endl;
 
-        int iterations = nnetwork->train(trainData);
-
-        std::cout << "Number of iterations used to train the classifier : " << iterations << std::endl;
+        nnetwork->train(trainData);
 
         //We test it with the validation data
         std::cout << "Calculating error on the validation sample." << std::endl;
@@ -198,8 +197,6 @@ int main( int argc, char** argv ) {
           nnetwork->predict(validationSample, classificationResult);
 
           minMaxLoc(classificationResult, 0, 0, 0, &max_loc);
-
-          std::cout << classificationResult << " " << validationClassifications.at<float>(tsample, 0) << " " << validationClassifications.at<float>(tsample, 1)  << std::endl;
 
           //getting wrong and correct classification
           if (validationClassifications.at<float>(tsample, max_loc.x) == 1) {
