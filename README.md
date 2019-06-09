@@ -42,8 +42,8 @@ They can be used as shown in the examples below:
 ./bin/svm data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test svm
 
 # We check the models
-./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/svm.xml
-./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/neuralNetwork.xml
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/svm.xml 1
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/neuralNetwork.xml 3
 ```
 
 ## Description of the files

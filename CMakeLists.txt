@@ -16,10 +16,6 @@ project(./bin/svm)
 add_executable(./bin/svm ./src/svm.cpp)
 target_link_libraries(./bin/svm ${OpenCV_LIBS} )
 
-project(./bin/randomForest)
-add_executable(./bin/randomForest ./src/randomForest.cpp)
-target_link_libraries(./bin/randomForest ${OpenCV_LIBS} )
-
 project(./bin/neuralNetwork)
 add_executable(./bin/neuralNetwork ./src/neuralNetwork.cpp)
 target_link_libraries(./bin/neuralNetwork ${OpenCV_LIBS} )
