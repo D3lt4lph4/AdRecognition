@@ -38,16 +38,12 @@ They can be used as shown in the examples below:
 # Now let's train the neural network
 ./bin/neuralNetwork data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test neuralNetwork
 
-# Again with the random forest
-./bin/randomForest data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test randomForest 
-
 # ... And the SVM (kfold is used so we don't use the SubSub files)
 ./bin/svm data/ad_cranfieldRandomizedSub.train data/ad_cranfieldRandomizedSub.test svm
 
 # We check the models
 ./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/svm.xml
-./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/rf.xml
-./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/nn.xml
+./bin/modelTester data/ad_cranfieldRandomizedSub.test data/models/neuralNetwork.xml
 ```
 
 ## Description of the files
