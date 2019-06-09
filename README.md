@@ -19,7 +19,6 @@ This will generate 7 executable files:
 - selectlines, select a subset of line from the specified file
 - selectRatio, slip the specified dataset in two smaller dataset given the specified ratio
 - neuralNetwork
-- randomForest
 - svm
 - modelTester
 
@@ -56,7 +55,6 @@ The data files:
 - ad_cranfield.data file - The set of data (CSV file format)
 - ad_cranfieldRandomized.data - The randomized dataset
 - ad_cranfieldRandomizedSub.train/ad_cranfieldRandomizedSub.test - The randomized dataset split into train and test sets
-- ad_cranfieldRandomizedSubSub.train/ad_cranfieldRandomizedSubSub.val - The randomized train set split into train and validation
 
 The models files, train example models.
 
